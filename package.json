@@ -1,0 +1,21 @@
+{
+  "name": "get_your_book_server",
+  "version": "1.0.0",
+  "description": "this is the server side ",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx mocha tests/*spec.js",
+    "start": "node src/index.js"
+  },
+  "author": "Hodaya",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.2.1",
+    "@types/mocha": "^10.0.10",
+    "chai": "^4.5.0",
+    "mocha": "^11.1.0"
+  }
+}
