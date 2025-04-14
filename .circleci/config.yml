@@ -23,6 +23,11 @@ jobs:
       - run:
           name: deploy
           command: '#e.g. ./deploy.sh'
+          
+
+
+
+
 workflows:
   build-and-test:
     jobs:
@@ -30,3 +35,47 @@ workflows:
     # - deploy:
     #     requires:
     #       - test-node
+
+
+
+
+# jobs:
+#   test-node:
+#     # Install node dependencies and run tests
+#     executor: node/default
+#     steps:
+#       - checkout
+#       - node/install-packages:
+#           pkg-manager: npm
+#       - run:
+#           name: Run tests
+#           command: npm test --passWithNoTests
+#   deploy:
+#     # This is an example deploy job, not actually used by the workflow
+#     docker:
+#       - image: cimg/base:stable
+#     steps:
+#       # Replace this with steps to deploy to users
+#       - run:
+#           name: deploy
+#           command: '#e.g. ./deploy.sh'
+#   build-test:
+#     executor:
+#       name: node/default
+#     steps:
+#       - checkout
+#       - run:
+#           name: install dependencies
+#           command: npm install
+#       - run:
+#           name: Run tests
+#           command: npm test
+# workflows:
+#   build-and-test:
+#     jobs:
+#       - test-node
+#       # Uncomment and configure deploy job when ready
+#       # - deploy:
+#       #     requires:
+#       #       - test-node
+#       - build-test
