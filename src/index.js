@@ -8,11 +8,11 @@ const port = 3000
 
 
 
-
-
 const allowedOrigins = [
-  'http://localhost:3001',          // פיתוח מקומי
-  'https://get-your-book-client.onrender.com', // אתר הלקוח
+  'http://localhost:3001',          
+  'https://get-your-book-client.onrender.com',
+  'https://get-your-book-server.onrender.com',
+  'http://localhost:5173'
 ];
 
 app.use(cors({
