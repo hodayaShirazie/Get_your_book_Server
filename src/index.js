@@ -7,12 +7,11 @@ const port = 3000
 // app.use(cors());
 
 
-
 const allowedOrigins = [
-  'http://localhost:3001',          
-  'https://get-your-book-client.onrender.com',
-  'https://get-your-book-server.onrender.com',
-  'http://localhost:5173'
+  process.env.ALLOWED_ORIGIN_1,
+  process.env.ALLOWED_ORIGIN_2,
+  process.env.ALLOWED_ORIGIN_3,
+  process.env.ALLOWED_ORIGIN_4,
 ];
 
 app.use(cors({
@@ -27,8 +26,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-
 
 
 
