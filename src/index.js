@@ -4,26 +4,26 @@ const cors = require('cors');
 const app = express()
 const port = 3000
 
-// app.use(cors());
+app.use(cors());
 
 
-const allowedOrigins = [
-  process.env.ALLOWED_ORIGIN_1,
-  process.env.ALLOWED_ORIGIN_2,
-  process.env.ALLOWED_ORIGIN_3,
-  process.env.ALLOWED_ORIGIN_4,
-];
+// const allowedOrigins = [
+//   process.env.ALLOWED_ORIGIN_1,
+//   process.env.ALLOWED_ORIGIN_2,
+//   process.env.ALLOWED_ORIGIN_3,
+//   process.env.ALLOWED_ORIGIN_4,
+// ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true
+// }));
 
 app.use(express.json());
 
