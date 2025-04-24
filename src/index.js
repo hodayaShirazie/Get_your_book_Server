@@ -77,10 +77,16 @@ app.post('/users', async (req, res) => {
 
 app.get('/about', (req, res) => {
   res.json({
-    about_project: 'Get Your Book is an innovative platform designed to make book purchasing and rental seamless and enjoyable. \nThe project is focused on improving accessibility and efficiency in how people interact with books.',
-    about_team: ' We are Team 9 - a group of enthusiastic students committed to clean UI/UX, efficient backend logic, and full-stack functionality. \nEach of us contributes a unique strength to this meaningful educational project.'
+    about_project: 'Welcome to Get Your Book - a new shopping experience for book lovers.\nHere, you’ll find a wide selection of books, a simple and user-friendly system, and an interface that lets you order your next read in just a few clicks.\nWe’re here to make your search for a good book pleasant, fast, and fun.',
+    about_team: ' We’re Team 9 – students who love building cool stuff together. \nFueled by caffeine and teamwork, we created this project with a lot of passion and a bit of fun on the side.'
   });
 });
+
+app.get('/ping', (req, res) => {
+  res.json({
+    message: 'pong team 9 '
+  })
+})
 
 
 
