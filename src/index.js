@@ -7,23 +7,7 @@ const port = 3000
 app.use(cors());
 
 
-// const allowedOrigins = [
-//   process.env.ALLOWED_ORIGIN_1,
-//   process.env.ALLOWED_ORIGIN_2,
-//   process.env.ALLOWED_ORIGIN_3,
-//   process.env.ALLOWED_ORIGIN_4,
-// ];
 
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     if (!origin || allowedOrigins.includes(origin)) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   credentials: true
-// }));
 
 app.use(express.json());
 
@@ -88,6 +72,14 @@ app.post('/users', async (req, res) => {
     console.error('❌ Error inserting user:', err);
     res.status(500).send("❌ Failed to create user");
   }
+});
+
+
+app.get('/about', (req, res) => {
+  res.json({
+    about_project: 'Get Your Book is an innovative platform designed to make book purchasing and rental seamless and enjoyable. \nThe project is focused on improving accessibility and efficiency in how people interact with books.',
+    about_team: ' We are Team 9 - a group of enthusiastic students committed to clean UI/UX, efficient backend logic, and full-stack functionality. \nEach of us contributes a unique strength to this meaningful educational project.'
+  });
 });
 
 
