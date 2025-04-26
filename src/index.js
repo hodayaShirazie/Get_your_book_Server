@@ -7,7 +7,41 @@ const port = 3000
 app.use(cors());
 
 app.use(express.json());
+app.post("/user/login", async (req, res) => {
+  const { username, password } = req.body;
+  if (
+    typeof username === "string" &&
+    typeof password === "string" &&
+    username.length >= 3 &&
+    password.length >= 6
+  ) {
+    return res.status(200).json({ message: "Login successful" });
+  }
 
+  return res
+    .status(400)
+    .json({
+      error: "Username is at least 4 characters and password is at least 3 characters.",
+    });
+});
+
+app.post("/admin/login", async (req, res) => {
+  const { username, password } = req.body;
+  if (
+    typeof username === "string" &&
+    typeof password === "string" &&
+    username.length >= 3 &&
+    password.length >= 6
+  ) {
+    return res.status(200).json({ message: "Login successful" });
+  }
+
+  return res
+    .status(400)
+    .json({
+      error: "Username and password must be at least 5 characters long",
+    });
+});
 
 app.get('/', (req, res) => {
   res.send('Hello Hodaya!!!!!!!')
