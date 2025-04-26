@@ -6,13 +6,7 @@ const port = 3000
 
 app.use(cors());
 
-
-
-
 app.use(express.json());
-
-
-
 
 
 app.get('/', (req, res) => {
@@ -81,6 +75,8 @@ app.get('/about', (req, res) => {
     about_team: ' We’re Team 9 – students who love building cool stuff together. \nFueled by caffeine and teamwork, we created this project with a lot of passion and a bit of fun on the side.'
   });
 });
+
+
 
 app.get('/ping', (req, res) => {
   res.json({
