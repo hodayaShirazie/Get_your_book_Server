@@ -7,6 +7,7 @@ const port = 3000
 app.use(cors());
 
 app.use(express.json());
+
 app.post("/user/login", async (req, res) => {
   const { username, password } = req.body;
   if (
@@ -117,6 +118,79 @@ app.get('/ping', (req, res) => {
     message: 'pong team 9 '
   })
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import express from 'express';
+// import pool from './data-access/db.js';
+// import bcrypt from 'bcrypt';
+
+
+// security questions
+app.get('/security-questions', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, question FROM security_question');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error loading security questions' });
+  }
+});
+
+// registration user
+app.post('/register', async (req, res) => {
+  const { username, password, securityQuestionId, securityAnswer } = req.body;
+  if (!username || !password || !securityQuestionId || !securityAnswer) {
+    return res.status(400).json({ message: 'Missing fields' });
+  }
+  try {
+    const userExists = await pool.query('SELECT id FROM "user" WHERE username = $1', [username]);
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ message: 'Username already taken, please choose another' });
+    }
+
+    // const hashedPassword = await bcrypt.hash(password, 10);
+    await pool.query(`
+      INSERT INTO "user" (username, password, security_question_id, security_answer)
+      VALUES ($1, $2, $3, $4)
+    `, [username, password, securityQuestionId, securityAnswer]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error during registration' });
+  }
+});
+
+
+
+
+
 
 
 

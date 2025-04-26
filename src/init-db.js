@@ -46,20 +46,20 @@ const initDb = async () => {
 
     console.log("✅ Table 'user' created.");
 
-    // // Create Manager table
-    // await pool.query(`
-    //     CREATE TABLE IF NOT EXISTS "manager" (
-    //     id SERIAL PRIMARY KEY,
-    //     username TEXT UNIQUE NOT NULL,
-    //     password TEXT NOT NULL
-    //   );
-    // `);
-
-    // Insert default manager
+    // Create Manager table
     await pool.query(`
-        INSERT INTO "manager" (username, password)
-        VALUES ('admin', 'admin123')
+        CREATE TABLE IF NOT EXISTS "manager" (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+      );
     `);
+
+    // // Insert default manager
+    // await pool.query(`
+    //     INSERT INTO "manager" (username, password)
+    //     VALUES ('admin', 'admin123')
+    // `);
 
  
 
