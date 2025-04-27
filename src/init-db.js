@@ -6,13 +6,6 @@ const initDb = async () => {
   try {
     console.log("Connecting with:", process.env.DATABASE_URL);
 
-    // // Drop existing tables (if they exist)
-    // await pool.query(`DROP TABLE IF EXISTS "User" CASCADE;`);
-    // await pool.query(`DROP TABLE IF EXISTS "Manager" CASCADE;`);
-    // await pool.query(`DROP TABLE IF EXISTS "security_question" CASCADE;`);
-
-    // console.log("✅ Old tables dropped.");
-
     // Create SecurityQuestion table
     await pool.query(`
         CREATE TABLE IF NOT EXISTS "security_question" (

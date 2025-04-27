@@ -42,39 +42,6 @@ app.get('/user', async (req, res) => {
 
 
 
-// app.post('/login', async (req, res) => {
-//   const { username, password } = req.body;
-//   console.log("Received data:", req.body);
-
-//   // If no username or password is provided
-//   if (!username || !password) {
-//       return res.status(400).json({ message: 'Username and password are required' });
-//   }
-
-//   try {
-//       // Query the database for the user
-//       const result = await pool.query('SELECT * FROM "user" WHERE username = $1', [username]);
-
-//       if (result.rows.length === 0) {
-//           return res.status(401).json({ message: 'Invalid username or password' });
-//       }
-
-//       const user = result.rows[0];
-
-    
-//       if (user.password !== password) {
-//         return res.status(401).json({ message: 'Invalid username or password' });
-//     }
-
-//       // Success - return user details
-//       res.status(200).json({success: true, message: 'Login successful', userId: user.id, username: user.username
-//       });  } catch (err) {
-//       console.error(err);
-//       res.status(500).json({ message: 'System error' });
-//   }
-// });
-
-
 app.get('/about', (req, res) => {
   res.json({
     about_project: 'Welcome to Get Your Book - a new shopping experience for book lovers.\nHere, you’ll find a wide selection of books, a simple and user-friendly system, and an interface that lets you order your next read in just a few clicks.\nWe’re here to make your search for a good book pleasant, fast, and fun.',
@@ -125,13 +92,6 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Server error during registration' });
   }
 });
-
-
-
-
-
-
-
 
 
 
@@ -196,21 +156,6 @@ app.post('/recover-password', async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   console.log("Received data:", req.body);
@@ -269,13 +214,6 @@ app.post('/login', async (req, res) => {
       res.status(500).json({ message: 'System error' });
   }
 });
-
-
-
-
-
-
-
 
 
 
