@@ -237,7 +237,8 @@ app.post('/login', async (req, res) => {
               message: 'Login successful',
               role: 'customer',
               userId: user.id,
-              username: user.username
+              username: user.username,
+              role: 'customer'
           });
       }
 

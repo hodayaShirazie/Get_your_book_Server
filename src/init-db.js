@@ -61,10 +61,7 @@ const initDb = async () => {
     //     VALUES ('admin', 'admin123')
     // `);
 
-    await pool.query(`
-      INSERT INTO "user" (username, password, security_question_id, security_answer)
-      VALUES ('admin', 'admin123', 1, 1)
-`);
+ 
 
  
 
