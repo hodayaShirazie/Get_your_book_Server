@@ -3,7 +3,7 @@
 ## Description  
 This project is the backend for the **Get Your Book** online bookstore platform. The server is responsible for handling user authentication, book management, order processing, and delivering data to the frontend. It is built using **Node.js** and **Express.js**, providing a RESTful API to interact with the client-side application.
 
-The project is structured as follows:
+## The project is structured as follows:
 ```plaintext
 
 ├── circleci/
