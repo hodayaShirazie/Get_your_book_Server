@@ -12,16 +12,13 @@ jobs:
           pkg-manager: npm
       - run:
           name: Install dependencies
-          command: npm install  # הוספתי את שלב ההתקנה של התלויות
+          command: npm install
       - run:
           name: Run tests
           command: npm test --passWithNoTests
       - run:
           name: Run linter
           command: npm run lint
-      - run:
-          # name: Build the Vite app
-          # command: npm run build
       - run:
           name: Deploy app to server
           command: curl 'https://get-your-book-server.onrender.com'
