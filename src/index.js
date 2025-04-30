@@ -305,55 +305,6 @@ else if(role == 'admin') {
 
 
 // Update user profile
-// app.post('/update-profile', async (req, res) => {
-//   const { currentUsername, newUsername, newPasswordת  } = req.body;
-
-//   if (!currentUsername || !newUsername || !newPassword) {
-//     return res.status(400).json({ message: 'Missing input fields' });
-//   }
-
-//   try {
-//     // Check if the new username is already taken by another user
-//     const userExists = await pool.query(
-//       'SELECT id FROM "user" WHERE username = $1 AND username != $2',
-//       [newUsername, currentUsername]
-//     );
-
-//     if (userExists.rows.length > 0) {
-//       return res.status(400).json({ message: 'Username already taken, please choose another' });
-//     }
-
-//     // Check if the current username exists
-//     const result = await pool.query('SELECT password FROM "user" WHERE username = $1', [currentUsername]);
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//     // Check if the new username and password are the same as the current ones
-//     const currentPassword = result.rows[0].password;
-
-//     if (currentPassword === newPassword && currentUsername === newUsername) {
-//       return res.status(400).json({ message: 'Nothing to update - both username and password are the same' });
-//     }
-
-//     // update the user profile
-//     await pool.query(
-//       'UPDATE "user" SET username = $1, password = $2 WHERE username = $3',
-//       [newUsername, newPassword, currentUsername]
-//     );
-
-//     res.status(200).json({ success: true, message: 'Profile updated successfully' });
-
-//   } catch (error) {
-//     console.error('Error updating profile:', error);
-//     res.status(500).json({ message: 'Server error during profile update' });
-//   }
-// });
-
-
-// Update user profile
-// Update user profile
 app.post('/update-profile', async (req, res) => {
   const { currentUsername, newUsername, newPassword, role } = req.body;
 
@@ -410,7 +361,32 @@ app.post('/update-profile', async (req, res) => {
 
 
 
+// POST add product
+app.post('/add-product', async (req, res) => {
+  const {
+    name,
+    description,
+    category,
+    price,
+    image,
+    stock_quantity,
+    min_stock_threshold
+  } = req.body;
 
+  try {
+    const result = await pool.query(`
+      INSERT INTO product 
+      (name, description, category_id, price, image, stock_quantity, min_stock_threshold)
+      VALUES ($1, $2, $3, $4, decode($5, 'base64'), $6, $7)
+      RETURNING *;
+    `, [name, description, category, price, image ? Buffer.from(image).toString('base64') : '', stock_quantity, min_stock_threshold]);
+
+    res.status(201).json({ message: 'Product added successfully', product: result.rows[0] });
+  } catch (err) {
+    console.error('Error inserting product:', err);
+    res.status(500).json({ error: 'Failed to insert product' });
+  }
+});
 
 
 
