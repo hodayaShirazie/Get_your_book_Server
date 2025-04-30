@@ -35,8 +35,10 @@ To run the backend server on your local machine, follow these steps:
 
 2. Navigate to the project directory:  
    `cd Get_your_book_Server`
+3. Install dependencies:
+   `npm install` 
 
-3. Create a `.env` file in the root directory and add your DB external URL connection.
+4. Create a `.env` file in the root directory and add your DB external URL connection.
 
-4. Start the server:  
+5. Start the server:  
    `npm start`
