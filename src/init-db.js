@@ -14,7 +14,7 @@ const initDb = async () => {
       );
     `);
 
-    console.log("✅ Table 'security_question' created.");
+    console.log("Table 'security_question' created.");
 
     // // Insert 3 rows into SecurityQuestion
     // await pool.query(`
@@ -24,7 +24,7 @@ const initDb = async () => {
     //   ('What is the name of your elementary school?');
     // `);
 
-    console.log("✅ Default security questions inserted.");
+    console.log("Default security questions inserted.");
 
     // Create User table
     await pool.query(`
@@ -37,7 +37,7 @@ const initDb = async () => {
       );
     `);
 
-    console.log("✅ Table 'user' created.");
+    console.log("Table 'user' created.");
 
     // Create Manager table
     await pool.query(`
@@ -58,11 +58,11 @@ const initDb = async () => {
 
  
 
-    console.log("✅ Table 'manager' created.");
+    console.log("Table 'manager' created.");
 
     process.exit(0);
   } catch (err) {
-    console.error("❌ Error initializing database:", err);
+    console.error("Error initializing database:", err);
     process.exit(1);
   }
 };
