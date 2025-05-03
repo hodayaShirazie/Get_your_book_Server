@@ -88,9 +88,12 @@ const initDb = async () => {
             stock_quantity INTEGER DEFAULT 30 NOT NULL,
             min_stock_threshold INTEGER DEFAULT 10 NOT NULL,
             rating NUMERIC(3, 2) DEFAULT 0.00 NOT NULL,
-            sells INTEGER DEFAULT 0 NOT NULL
+            sells INTEGER DEFAULT 0 NOT NULL,
+            created_at TIMESTAMP DEFAULT NOW()
         );
     `);
+
+    
 
     console.log("Table 'product' created.");
 
