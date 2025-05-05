@@ -48,5 +48,87 @@ CREATE TABLE IF NOT EXISTS "product" (
 );
 
 
+--create available_delivery_times table              
+CREATE TABLE available_delivery_times (
+    id SERIAL PRIMARY KEY,
+    day_of_week VARCHAR(10) NOT NULL CHECK (day_of_week IN (
+        'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    )),
+    morning_available BOOLEAN DEFAULT FALSE,
+    afternoon_available BOOLEAN DEFAULT FALSE,
+    evening_available BOOLEAN DEFAULT FALSE
+);
+
+
+--- Create Order table ---
+CREATE TABLE order (
+    id SERIAL PRIMARY KEY,
+    sum_of_purchase NUMERIC(10, 2) NOT NULL,
+    number_of_products INTEGER NOT NULL,
+    order_date DATE NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES "user"(id),
+    status VARCHAR(20) NOT NULL CHECK (status IN ('approved', 'canceled')),
+    delivery_method VARCHAR(20) NOT NULL CHECK (delivery_method IN ('pickup-point', 'home-delivery')),
+    address VARCHAR(255),
+    delivery_date DATE,
+    time_slot_delivery VARCHAR(10) CHECK (time_slot IN ('morning', 'afternoon', 'evening'))
+);
+
+
+--- Create Order_product table ---
+CREATE TABLE order_product (
+    user_id INTEGER NOT NULL,
+    order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+
+    PRIMARY KEY (order_id, product_id),
+    
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (order_id) REFERENCES order(id),
+    FOREIGN KEY (product_id) REFERENCES product(id)
+);
+
+--- create shopping_cart table ---
+CREATE TABLE shopping_cart (
+    user_id INTEGER NOT NULL,
+    book_id INTEGER NOT NULL,
+    quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+
+    PRIMARY KEY (user_id, book_id),
+
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (book_id) REFERENCES product(id)
+);
+
+--- create book_rating table ---
+CREATE TABLE book_rating (
+    user_id INTEGER NOT NULL,
+    book_id INTEGER NOT NULL,
+    stars INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+
+    PRIMARY KEY (user_id, book_id),
+
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (book_id) REFERENCES produc(id)
+);
+
+--- create wish_list table ---
+CREATE TABLE wish_list (
+    user_id INTEGER NOT NULL,
+    book_id INTEGER NOT NULL,
+
+    PRIMARY KEY (user_id, book_id),
+
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (book_id) REFERENCES product(id)
+);
+
+
+
+
+
+
+
 
   

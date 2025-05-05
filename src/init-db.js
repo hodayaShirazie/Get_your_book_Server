@@ -48,6 +48,9 @@ const initDb = async () => {
       );
     `);
 
+    console.log("Table 'manager' created.");
+
+
     // // Insert default manager
     // await pool.query(`
     //     INSERT INTO "manager" (username, password)
@@ -56,7 +59,7 @@ const initDb = async () => {
 
 
         // Create Category table
-        await pool.query(`
+    await pool.query(`
         CREATE TABLE IF NOT EXISTS "category" (
           id SERIAL PRIMARY KEY,
           category TEXT UNIQUE NOT NULL
@@ -74,9 +77,8 @@ const initDb = async () => {
     //     ('Children');    
     // `);
 
-    console.log("Default categories inserted.");
 
-    // Create Product table
+    // Create product table
     await pool.query(`
         CREATE TABLE IF NOT EXISTS "product" (
             id SERIAL PRIMARY KEY,
@@ -94,14 +96,111 @@ const initDb = async () => {
     `);
 
     
-
     console.log("Table 'product' created.");
 
- 
 
- 
+    // Create orders table 
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS orders (
+          id SERIAL PRIMARY KEY,
+          sum_of_purchase NUMERIC(10, 2) NOT NULL,
+          number_of_products INTEGER NOT NULL,
+          order_date DATE NOT NULL,
+          user_id INTEGER NOT NULL REFERENCES "user"(id),
+          status VARCHAR(20) NOT NULL CHECK (status IN ('approved', 'canceled')),
+          delivery_method VARCHAR(20) NOT NULL CHECK (delivery_method IN ('pickup-point', 'home-delivery')),
+          address VARCHAR(255),
+          delivery_date DATE,
+          time_slot_delivery VARCHAR(10) CHECK (time_slot_delivery IN ('morning', 'afternoon', 'evening'))
+      );
+    `);
+    console.log("Table 'orders' created.");
 
-    console.log("Table 'manager' created.");
+    //Create order_product table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS order_product (
+        user_id INTEGER NOT NULL,
+        order_id INTEGER NOT NULL,
+        product_id INTEGER NOT NULL,
+        quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+
+        PRIMARY KEY (order_id, product_id),
+        
+        FOREIGN KEY (user_id) REFERENCES "user"(id),
+        FOREIGN KEY (order_id) REFERENCES "orders"(id),
+        FOREIGN KEY (product_id) REFERENCES "product"(id)
+      );
+    `);
+
+    console.log("Table 'order_product' created.");
+
+
+    // Create available_delivery_times table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS available_delivery_times (
+        id SERIAL PRIMARY KEY,
+        day_of_week VARCHAR(10) NOT NULL CHECK (day_of_week IN (
+            'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+        )),
+        morning_available BOOLEAN DEFAULT FALSE,
+        afternoon_available BOOLEAN DEFAULT FALSE,
+        evening_available BOOLEAN DEFAULT FALSE
+    );`)
+
+    console.log("Table 'available_delivery_times' created.");
+
+
+    // Create shopping_cart table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS shopping_cart (
+        user_id INTEGER NOT NULL,
+        book_id INTEGER NOT NULL,
+        quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+    
+        PRIMARY KEY (user_id, book_id),
+    
+        FOREIGN KEY (user_id) REFERENCES "user"(id),
+        FOREIGN KEY (book_id) REFERENCES "product"(id)
+      );
+    `);
+
+    console.log("Table 'shopping_cart' created.");
+
+    // Create book_rating table
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS book_rating (
+          user_id INTEGER NOT NULL,
+          book_id INTEGER NOT NULL,
+          stars INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+
+          PRIMARY KEY (user_id, book_id),
+
+          FOREIGN KEY (user_id) REFERENCES "user"(id),
+          FOREIGN KEY (book_id) REFERENCES "product"(id)
+      );
+    `);
+
+    console.log("Table 'book_rating' created.");
+
+    
+    // Create wish_list table
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS wish_list (
+          user_id INTEGER NOT NULL,
+          book_id INTEGER NOT NULL,
+
+          PRIMARY KEY (user_id, book_id),
+
+          FOREIGN KEY (user_id) REFERENCES "user"(id),
+          FOREIGN KEY (book_id) REFERENCES "product"(id)
+      );
+    `);
+
+    console.log("Table 'wish_list' created.");
+
+
+
+
 
     process.exit(0);
   } catch (err) {
