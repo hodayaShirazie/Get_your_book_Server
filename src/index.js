@@ -2,6 +2,8 @@ const express = require('express')
 const pool = require('./data-access/db');
 const cors = require('cors');
 const multer = require('multer');
+const storage = multer.memoryStorage(); 
+const upload = multer({ storage });
 
 const app = express()
 const port = 3000
@@ -342,48 +344,6 @@ app.post('/update-profile', async (req, res) => {
 
 
 
-
-// // POST add product
-// app.post('/add-product', async (req, res) => {
-//   const {
-//     name,
-//     description,
-//     category,
-//     price,
-//     image,
-//     stock_quantity,
-//     min_stock_threshold
-//   } = req.body;
-
-//   try {
-//     const result = await pool.query(`
-//       INSERT INTO product 
-//       (name, description, category_id, price, image, stock_quantity, min_stock_threshold)
-//       VALUES ($1, $2, $3, $4, decode($5, 'base64'), $6, $7)
-//       RETURNING *;
-//     `, [name, description, category, price, image ? Buffer.from(image).toString('base64') : '', stock_quantity, min_stock_threshold]);
-
-//     res.status(201).json({ message: 'Product added successfully', product: result.rows[0] });
-//   } catch (err) {
-//     console.error('Error inserting product:', err);
-//     res.status(500).json({ error: 'Failed to insert product' });
-//   }
-// });
-
-
-
-
-
-
-
-/////////////////////////
-
-
-const storage = multer.memoryStorage(); 
-const upload = multer({ storage });
-
-
-
 // POST add product
 app.post('/add-product', upload.single('image'), async (req, res) => {
   try {
@@ -564,33 +524,148 @@ app.delete('/delete-product/:id', async (req, res) => {
 });
 
 
-/////////////
-app.get('/productss', async (req, res) => {
-  const category = req.query.category;
-  console.log('Category IN SERVER:', category); // Log the category for debugging
+
+app.post('/add-to-shopping-cart', async (req, res) => {
+  const { username, productId } = req.body;
+
+  if (!username || !productId) {
+    return res.status(400).json({ message: 'Missing username or product ID' });
+  }
 
   try {
-    let result;
-    if (category && category !== 'category') {  // אם קטגוריה נבחרה ולא ברירת המחדל "category"
-      result = await pool.query(`
-        SELECT p.*, c.category 
-        FROM product p
-        JOIN category c ON p.category_id = c.id
-        WHERE c.category = $1`, [category]);
-    } else {
-      // במקרה ואין קטגוריה, מציג את כל המוצרים
-      result = await pool.query(`
-        SELECT p.*, c.category 
-        FROM product p
-        JOIN category c ON p.category_id = c.id
-      `);
+    // Get the user ID from the username
+    const userResult = await pool.query(
+      'SELECT id FROM "user" WHERE username = $1',
+      [username]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
     }
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching products:', err);
-    res.status(500).send('Failed to fetch products');
+
+    const userId = userResult.rows[0].id;
+
+    // Check if the product already exists in the user's cart
+    const existingItem = await pool.query(
+      'SELECT quantity FROM shopping_cart WHERE user_id = $1 AND book_id = $2',
+      [userId, productId]
+    );
+
+    if (existingItem.rows.length > 0) {
+      // If exists – update quantity
+      await pool.query(
+        'UPDATE shopping_cart SET quantity = quantity + 1 WHERE user_id = $1 AND book_id = $2',
+        [userId, productId]
+      );
+    } else {
+      // If not exists – insert new item
+      await pool.query(
+        'INSERT INTO shopping_cart (user_id, book_id, quantity) VALUES ($1, $2, $3)',
+        [userId, productId, 1]
+      );
+    }
+
+    res.status(200).json({ message: 'Product added to shopping cart successfully' });
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    res.status(500).json({ message: 'Server error while adding to cart' });
   }
 });
+
+app.post('/remove-from-shopping-cart', async (req, res) => {
+  const { username, productId } = req.body;
+
+  if (!username || !productId) {
+    return res.status(400).json({ message: 'Missing username or product ID' });
+  }
+
+  try {
+    // Get the user ID from the username
+    const userResult = await pool.query(
+      'SELECT id FROM "user" WHERE username = $1',
+      [username]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Check the current quantity of the item in the shopping cart
+    const existingItem = await pool.query(
+      'SELECT quantity FROM shopping_cart WHERE user_id = $1 AND book_id = $2',
+      [userId, productId]
+    );
+
+    if (existingItem.rows.length === 0) {
+      return res.status(404).json({ message: 'Product not found in cart' });
+    }
+
+    const quantity = existingItem.rows[0].quantity;
+
+    if (quantity > 1) {
+      // If quantity is greater than 1, decrease the quantity by 1
+      await pool.query(
+        'UPDATE shopping_cart SET quantity = quantity - 1 WHERE user_id = $1 AND book_id = $2',
+        [userId, productId]
+      );
+    } else {
+      // If quantity is 1, remove the product from the cart
+      await pool.query(
+        'DELETE FROM shopping_cart WHERE user_id = $1 AND book_id = $2',
+        [userId, productId]
+      );
+    }
+
+    res.status(200).json({ message: 'Product quantity updated or removed from cart successfully' });
+  } catch (error) {
+    console.error('Error removing from cart:', error);
+    res.status(500).json({ message: 'Server error while removing from cart' });
+  }
+});
+
+
+
+
+app.get('/shopping-cart/:username', async (req, res) => {
+  const {username} = req.params;
+
+  if (!username) {
+    return res.status(400).json({ message: 'Missing username' });
+  }
+  try {
+    const userResult = await pool.query(
+      'SELECT id FROM "user" WHERE username = $1',
+      [username]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Get the products in the user's shopping cart
+    const result = await pool.query(
+      `SELECT p.id, p.name, p.price, sc.quantity 
+       FROM shopping_cart sc
+       JOIN product p ON sc.book_id = p.id
+       WHERE sc.user_id = $1`,
+      [userId]
+    );
+    
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error retrieving cart:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
+
 
 
 
