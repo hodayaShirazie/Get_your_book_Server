@@ -376,14 +376,16 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
 
 
 
+
 app.get('/products', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, name, price, image FROM product ORDER BY created_at DESC') ;
+    const result = await pool.query('SELECT id, name, price, image, category_id FROM product ORDER BY created_at DESC');
     const products = result.rows.map(p => ({
       id: p.id,
       name: p.name,
       price: p.price,
-      imageBase64: Buffer.from(p.image).toString('base64')
+      imageBase64: Buffer.from(p.image).toString('base64'),
+      category_id: p.category_id  
     }));
     res.json(products);
   } catch (err) {
@@ -391,6 +393,9 @@ app.get('/products', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+
+
 
 app.get('/products-all/:id', async (req, res) => {
   const { id } = req.params;
