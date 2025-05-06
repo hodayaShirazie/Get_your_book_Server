@@ -376,7 +376,6 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
 
 
 
-
 app.get('/products', async (req, res) => {
   try {
     const result = await pool.query('SELECT id, name, price, image FROM product ORDER BY created_at DESC') ;
@@ -648,20 +647,26 @@ app.get('/shopping-cart/:username', async (req, res) => {
 
     // Get the products in the user's shopping cart
     const result = await pool.query(
-      `SELECT p.id, p.name, p.price, sc.quantity 
+      `SELECT p.id, p.name, p.price, sc.quantity, p.image 
        FROM shopping_cart sc
        JOIN product p ON sc.book_id = p.id
        WHERE sc.user_id = $1`,
       [userId]
     );
+
+
+    // Convert image from BYTEA to Base64
+    const products = result.rows.map(product => ({
+      ...product,
+      image: `data:image/jpeg;base64,${Buffer.from(product.image).toString('base64')}`,
+    }));
     
-    res.json(result.rows);
+    res.json(products);
   } catch (error) {
     console.error('Error retrieving cart:', error);
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 
 
