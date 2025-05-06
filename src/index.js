@@ -669,6 +669,124 @@ app.get('/shopping-cart/:username', async (req, res) => {
 });
 
 
+// Delete all products of user from the shopping cart
+app.delete('/shopping-cart/:username', async (req, res) => {
+  const { username } = req.params;
+
+  if (!username) {
+    return res.status(400).json({ message: 'Missing username' });
+  }
+
+  try {
+    const userResult = await pool.query(
+      'SELECT id FROM "user" WHERE username = $1',
+      [username]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Delete the product from the shopping cart
+    await pool.query(
+      'DELETE FROM shopping_cart WHERE user_id = $1',
+      [userId]
+    );
+
+    res.status(200).json({ message: 'Products removed from shopping cart successfully' });
+  } catch (error) {
+    console.error('Error removing from cart:', error);
+    res.status(500).json({ message: 'Server error while removing from cart' });
+  }
+});
+
+// add order to orders table
+app.post('/add-order', async (req, res) => {
+  const {
+    sum_of_purchase,
+    number_of_products,
+    username,
+    status,
+    delivery_method,
+    address,
+    delivery_date,
+    time_slot_delivery
+  } = req.body;
+
+  const userResult = await pool.query(
+    'SELECT id FROM "user" WHERE username = $1',
+    [username]
+  );
+
+  if (userResult.rows.length === 0) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const user_id = userResult.rows[0].id;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO "orders" (
+        sum_of_purchase,
+        number_of_products,
+        order_date,
+        user_id,
+        status,
+        delivery_method,
+        address,
+        delivery_date,
+        time_slot_delivery
+      ) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7, $8)
+      RETURNING *`,
+      [
+        sum_of_purchase,
+        number_of_products,
+        user_id,
+        status,
+        delivery_method,
+        address || null,
+        delivery_date || null,
+        time_slot_delivery || null
+      ]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error inserting order:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+  // add to orde products table
+app.post('/add-order-products', async (req, res) => {
+  const {username, orderId, productId, quantity } = req.body;
+
+  const userResult = await pool.query(
+    'SELECT id FROM "user" WHERE username = $1',
+    [username]
+  );
+
+  if (userResult.rows.length === 0) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const userId = userResult.rows[0].id;
+  try {
+    const result = await pool.query(
+      `INSERT INTO order_product (user_id, order_id, product_id, quantity)
+       VALUES ($1, $2, $3, $4)`,
+      [userId, orderId, productId, quantity]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error inserting order products:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
