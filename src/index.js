@@ -744,7 +744,7 @@ app.post('/add-order', async (req, res) => {
         delivery_date,
         time_slot_delivery
       ) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7, $8)
-      RETURNING *`,
+      RETURNING id`,
       [
         sum_of_purchase,
         number_of_products,
@@ -756,8 +756,10 @@ app.post('/add-order', async (req, res) => {
         time_slot_delivery || null
       ]
     );
+    const orderId = result.rows[0].id;
+    console.log('New order ID:', orderId);
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ orderId }); // Return the new order ID to the client
   } catch (error) {
     console.error('Error inserting order:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -792,6 +794,43 @@ app.post('/add-order-products', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+// Get specific order by orderId
+app.get('/order-products/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const orderResult = await pool.query(`
+      SELECT id, sum_of_purchase, delivery_method, address, delivery_date, time_slot_delivery
+      FROM "orders"
+      WHERE id = $1
+    `, [orderId]);
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const order = orderResult.rows[0];
+
+    const productsResult = await pool.query(`
+      SELECT p.name, p.price, op.quantity
+      FROM order_product op
+      JOIN product p ON op.product_id = p.id
+      WHERE op.order_id = $1
+    `, [orderId]);
+
+    order.products = productsResult.rows;
+
+    res.json(order);
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 
 
 
