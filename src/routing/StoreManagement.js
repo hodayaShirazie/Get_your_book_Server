@@ -47,3 +47,62 @@ app.get("/statistics", async (req, res) => {
 
 
 module.exports = app;
+
+
+app.post('/api/delivery-days', async (req, res) => {
+  const { deliveryDays } = req.body;
+
+  console.log("Received deliveryDays:", deliveryDays);
+
+  try {
+    
+    await pool.query('DELETE FROM available_delivery_times');
+
+    for (const dayObj of deliveryDays) {
+      const { day, timeSlots } = dayObj;
+      const morning = timeSlots.includes("Morning");
+      const afternoon = timeSlots.includes("Afternoon");
+      const evening = timeSlots.includes("Evening");
+
+      await pool.query(`
+        INSERT INTO available_delivery_times 
+        (day_of_week, morning_available, afternoon_available, evening_available)
+        VALUES ($1, $2, $3, $4)
+      `, [day, morning, afternoon, evening]);
+    }
+
+    res.status(200).send('Delivery days updated successfully');
+  } catch (err) {
+    console.error('Error saving delivery days:', err);
+    res.status(500).send('Failed to update delivery days');
+  }
+});
+
+
+
+
+app.get('/api/delivery-days', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT day_of_week, morning_available, afternoon_available, evening_available
+      FROM available_delivery_times
+    `);
+
+    const formatted = result.rows.map(row => {
+      const timeSlots = [];
+      if (row.morning_available) timeSlots.push("Morning");
+      if (row.afternoon_available) timeSlots.push("Afternoon");
+      if (row.evening_available) timeSlots.push("Evening");
+
+      return {
+        day: row.day_of_week,
+        timeSlots,
+      };
+    });
+
+    res.json({ deliveryDays: formatted });
+  } catch (error) {
+    console.error('Failed to fetch delivery days:', error);
+    res.status(500).send('Server error');
+  }
+});
