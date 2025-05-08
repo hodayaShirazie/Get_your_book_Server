@@ -127,9 +127,10 @@ try {
 app.get('/all-orders', async (req, res) => {
 try {
     const ordersResult = await pool.query(`
-    SELECT id, order_date, sum_of_purchase, number_of_products
-    FROM "orders"
-    ORDER BY order_date DESC, id DESC
+    SELECT o.id, o.order_date, o.sum_of_purchase, o.number_of_products, o.status, u.username
+      FROM "orders" o
+      JOIN "user" u ON o.user_id = u.id
+      ORDER BY o.order_date DESC, o.id DESC
     `);
 
     const orders = ordersResult.rows;
@@ -142,6 +143,7 @@ try {
 }
 });
 
+// update order status
 app.put('/update-order-status/:orderId', async (req, res) => {
 const { orderId } = req.params;
 const { status } = req.body;
@@ -167,5 +169,62 @@ try {
 }
 
 });
+
+// filter orders by status, price range, and username
+app.get('/filtered-orders', async (req, res) => {
+    try {
+      const { status, priceRange, username } = req.query;
+      const values = [];
+      let conditions = [];
+  
+      if (status) {
+        conditions.push(`o.status = $${values.length + 1}`);
+        values.push(status);
+      }
+  
+      if (priceRange) {
+        switch (priceRange) {
+          case '1': // < 50
+            conditions.push(`o.sum_of_purchase < $${values.length + 1}`);
+            values.push(50);
+            break;
+          case '2': // 50–99
+            conditions.push(`o.sum_of_purchase >= $${values.length + 1} AND o.sum_of_purchase < $${values.length + 2}`);
+            values.push(50, 100);
+            break;
+          case '3': // 100–199
+            conditions.push(`o.sum_of_purchase >= $${values.length + 1} AND o.sum_of_purchase < $${values.length + 2}`);
+            values.push(100, 200);
+            break;
+          case '4': // 200+
+            conditions.push(`o.sum_of_purchase >= $${values.length + 1}`);
+            values.push(200);
+            break;
+        }
+      }
+  
+      if (username) {
+        conditions.push(`LOWER(u.username) = LOWER($${values.length + 1})`);
+        values.push(username);
+      }
+  
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  
+      const query = `
+        SELECT o.id, o.order_date, o.sum_of_purchase, o.number_of_products, o.status, u.username
+        FROM "orders" o
+        JOIN "user" u ON o.user_id = u.id
+        ${whereClause}
+        ORDER BY o.order_date DESC, o.id DESC
+      `;
+  
+      const result = await pool.query(query, values);
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Error filtering orders:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
 
 module.exports = app;

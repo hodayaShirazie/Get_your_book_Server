@@ -13,12 +13,14 @@ const Order = require('./routing/Order');
 const Product = require('./routing/Products');
 const ShoppingCart = require('./routing/ShoppingCart');
 const UserProfile = require('./routing/UserProfile');
+const StoreManagement = require('./routing/StoreManagement');
 
 app.use(Authentication);
 app.use(Order);
 app.use(Product);
 app.use(ShoppingCart);
 app.use(UserProfile);
+app.use(StoreManagement);
 
 
 
