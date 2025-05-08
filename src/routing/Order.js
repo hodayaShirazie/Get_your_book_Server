@@ -224,7 +224,7 @@ app.get('/filtered-orders', async (req, res) => {
       console.error('Error filtering orders:', error);
       res.status(500).json({ message: 'Server error' });
     }
-  });
+});
   
 
 module.exports = app;
