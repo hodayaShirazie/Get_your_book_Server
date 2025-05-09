@@ -203,6 +203,56 @@ app.get('/filtered-orders', async (req, res) => {
   }
 });
 
-  
+
+
+app.get('/missing-delivery-days', async (req, res) => {
+  try {
+    const allDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const result = await pool.query(`
+      SELECT DISTINCT day_of_week
+      FROM available_delivery_times
+    `);
+
+    const existingDays = result.rows.map(row => row.day_of_week);
+
+    const missingDays = allDays.filter(day => !existingDays.includes(day));
+
+    res.json({ missingDeliveryDays: missingDays });
+  } catch (error) {
+    console.error('Failed to fetch missing delivery days:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+app.get('/available-slots/:day', async (req, res) => {
+  try {
+    const { day } = req.params;
+
+    const result = await pool.query(`
+      SELECT morning_available, afternoon_available, evening_available
+      FROM available_delivery_times
+      WHERE day_of_week = $1
+    `, [day]);
+
+    if (result.rows.length === 0) {
+      return res.json({ availableSlots: [] });
+    }
+
+    const row = result.rows[0];
+    const slots = [];
+
+    if (row.morning_available) slots.push("morning");
+    if (row.afternoon_available) slots.push("afternoon");
+    if (row.evening_available) slots.push("evening");
+
+    res.json({ availableSlots: slots });
+  } catch (err) {
+    console.error("Error fetching available slots:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+
 
 module.exports = app;
