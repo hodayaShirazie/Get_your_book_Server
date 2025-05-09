@@ -105,7 +105,7 @@ const initDb = async () => {
           id SERIAL PRIMARY KEY,
           sum_of_purchase NUMERIC(10, 2) NOT NULL,
           number_of_products INTEGER NOT NULL,
-          order_date DATE NOT NULL,
+          order_date TIMESTAMP NOT NULL,
           user_id INTEGER NOT NULL REFERENCES "user"(id),
           status VARCHAR(20) NOT NULL CHECK (status IN ('approved', 'canceled')),
           delivery_method VARCHAR(20) NOT NULL CHECK (delivery_method IN ('pickup-point', 'home-delivery')),

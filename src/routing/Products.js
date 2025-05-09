@@ -31,7 +31,7 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
       console.error('Error adding product:', error);
       res.status(500).json({ error: 'Server error while adding product' });
     }
-  });
+});
   
 
 app.get('/products', async (req, res) => {
@@ -50,7 +50,6 @@ try {
     res.status(500).send('Server error');
 }
 });
-
 
 app.get('/products-all/:id', async (req, res) => {
 const { id } = req.params;

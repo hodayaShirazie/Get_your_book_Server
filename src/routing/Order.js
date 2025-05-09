@@ -39,7 +39,7 @@ app.post('/add-order', async (req, res) => {
           address,
           delivery_date,
           time_slot_delivery
-        ) VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, $7, $8)
+        ) VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7, $8)
         RETURNING id`,
         [
           sum_of_purchase,
@@ -203,6 +203,139 @@ app.get('/filtered-orders', async (req, res) => {
   }
 });
 
-  
+// Get all orders for a specific user
+app.get('/user-orders/:username', async (req, res) => {
+  const { username } = req.params;
+
+  if (!username) {
+    return res.status(400).json({ message: 'Missing username' });
+  }
+
+  try {
+    const userResult = await pool.query(
+      'SELECT id FROM "user" WHERE username = $1',
+      [username]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    const ordersResult = await pool.query(`
+      SELECT id, order_date, sum_of_purchase, number_of_products
+      FROM "orders"
+      WHERE user_id = $1
+      ORDER BY order_date DESC
+    `, [userId]);
+
+    if (ordersResult.rows.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this user' });
+    }
+
+    const orders = [];
+
+    for (const order of ordersResult.rows) {
+      const productsResult = await pool.query(`
+        SELECT p.name, p.price, op.quantity
+        FROM order_product op
+        JOIN product p ON op.product_id = p.id
+        WHERE op.order_id = $1
+      `, [order.id]);
+
+      orders.push({
+        ...order,
+        products: productsResult.rows,
+      });
+    }
+
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Cancel order
+app.delete("/cancel-order/:id", async (req, res) => {
+  const orderId = req.params.id;
+
+  try {
+    const result = await pool.query(`
+      SELECT order_date, NOW() - order_date AS diff
+      FROM orders
+      WHERE id = $1
+    `, [orderId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).send("Order not found.");
+    }
+
+    const timeDiff = result.rows[0].diff;
+    const hours = parseFloat(timeDiff.hours) || 0;
+    const minutes = parseFloat(timeDiff.minutes) || 0;
+    const totalMinutes = hours * 60 + minutes;
+
+    console.log("Time difference in minutes:", totalMinutes);
+
+    if (totalMinutes > 60) {
+      return res.status(400).send("Cannot cancel after one hour.");
+    }
+
+    await pool.query(`
+      DELETE FROM order_product WHERE order_id = $1
+    `, [orderId]);
+
+    await pool.query(`
+      DELETE FROM orders WHERE id = $1
+    `, [orderId]);
+
+    res.status(200).send("Order cancelled successfully.");
+  } catch (err) {
+    if (err.code === '23503') {
+      return res.status(400).send("Cannot cancel order because it's still referenced in order_product.");
+    }
+    console.error("Error cancelling order:", err);
+    res.status(500).send("Server error.");
+  }
+});
+
+
+// Check if order can be cancelled
+app.get("/can-cancel-order/:id", async (req, res) => {
+  const orderId = req.params.id;
+
+  try {
+    const result = await pool.query(`
+      SELECT order_date, NOW() - order_date AS diff
+      FROM orders
+      WHERE id = $1
+    `, [orderId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).send("Order not found.");
+    }
+
+    const timeDiff = result.rows[0].diff;
+    const hours = parseFloat(timeDiff.hours) || 0;
+    const minutes = parseFloat(timeDiff.minutes) || 0;
+    const totalMinutes = hours * 60 + minutes;
+
+    console.log("Time difference in minutes:", totalMinutes);
+
+    if (totalMinutes > 60) {
+      return res.status(400).send("Cannot cancel after one hour.");
+    }
+
+    res.status(200).send("Order can be cancelled.");
+  } catch (err) {
+    console.error("Error checking order cancellation:", err);
+    res.status(500).send("Server error.");
+  }
+});
+
+
+
 
 module.exports = app;
