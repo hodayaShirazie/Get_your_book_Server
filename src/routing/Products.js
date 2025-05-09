@@ -177,4 +177,31 @@ try {
 }
 });
 
+// Search for books
+app.get('/search-books', async (req, res) => {
+    const searchTerm = req.query.q;
+  
+    try {
+      const result = await pool.query(
+        'SELECT id, name, price, image, category_id FROM product WHERE name ILIKE $1 ORDER BY created_at DESC',
+        [`%${searchTerm}%`]
+      );
+      const products = result.rows.map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        imageBase64: Buffer.from(p.image).toString('base64'),
+        category_id: p.category_id  
+        }));
+        res.json(products);
+    } catch (err) {
+        console.error('Failed to fetch products', err);
+        res.status(500).send('Server error');
+    }
+});
+  
+
+
+
+
 module.exports = app;
