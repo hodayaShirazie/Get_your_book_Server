@@ -45,10 +45,6 @@ app.get("/statistics", async (req, res) => {
   });
 
 
-
-module.exports = app;
-
-
 app.post('/api/delivery-days', async (req, res) => {
   const { deliveryDays } = req.body;
 
@@ -79,8 +75,6 @@ app.post('/api/delivery-days', async (req, res) => {
 });
 
 
-
-
 app.get('/api/delivery-days', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -106,3 +100,78 @@ app.get('/api/delivery-days', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+/////////////////////////
+
+app.get('/available-delivery-days', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT day_of_week, morning_available, afternoon_available, evening_available
+      FROM available_delivery_times
+    `);
+
+    const validDays = result.rows
+      .filter(row =>
+        row.morning_available || row.afternoon_available || row.evening_available
+      )
+      .map(row => row.day_of_week);
+
+    res.json({ validDeliveryDays: validDays });
+  } catch (error) {
+    console.error('Failed to fetch delivery days:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+app.get('/unavailable-delivery-times', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT day_of_week, morning_available, afternoon_available, evening_available
+      FROM available_delivery_times
+    `);
+
+    const formatted = result.rows.map(row => {
+      const timeSlots = [];
+      if (!row.morning_available) timeSlots.push("Morning");
+      if (!row.afternoon_available) timeSlots.push("Afternoon");
+      if (!row.evening_available) timeSlots.push("Evening");
+
+      return {
+        day: row.day_of_week,
+        timeSlots,
+      };
+    }).filter(entry => entry.timeSlots.length > 0); 
+
+    res.json({ unavailableDeliveryTimes: formatted });
+  } catch (error) {
+    console.error('Failed to fetch unavailable delivery times:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+app.get('/missing-delivery-days', async (req, res) => {
+  try {
+    const allDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const result = await pool.query(`
+      SELECT DISTINCT day_of_week
+      FROM available_delivery_times
+    `);
+
+    const existingDays = result.rows.map(row => row.day_of_week);
+
+    const missingDays = allDays.filter(day => !existingDays.includes(day));
+
+    res.json({ missingDeliveryDays: missingDays });
+  } catch (error) {
+    console.error('Failed to fetch missing delivery days:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
+
+module.exports = app;

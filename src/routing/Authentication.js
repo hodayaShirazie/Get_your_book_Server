@@ -26,7 +26,7 @@ app.post('/register', async (req, res) => {
       console.error(err);
       res.status(500).json({ message: 'Server error during registration' });
     }
-  });
+});
 
 // login user
 app.post('/login', async (req, res) => {
@@ -87,7 +87,7 @@ app.post('/login', async (req, res) => {
         console.error(err);
         res.status(500).json({ message: 'System error' });
     }
-  });
+});
   
 // Get all security questions
 app.get('/security-questions', async (req, res) => {
@@ -98,7 +98,7 @@ app.get('/security-questions', async (req, res) => {
       console.error(err);
       res.status(500).json({ message: 'Server error loading security questions' });
     }
-  });
+});
 
 // Get security question for a specific user
 app.get('/security-question/:username', async (req, res) => {
@@ -120,7 +120,7 @@ app.get('/security-question/:username', async (req, res) => {
       console.error('Security question fetch error:', error);
       res.status(500).json({ message: 'Server error' });
     }
-  });
+});
 
 // Password recovery
 app.post('/recover-password', async (req, res) => {
@@ -149,8 +149,33 @@ app.post('/recover-password', async (req, res) => {
       console.error('Password recovery error:', error);
       res.status(500).json({ success: false });
     }
-  });
+});
 
+// Reset password
+app.post('/reset-password', async (req, res) => {
+  const { username, password} = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Missing fields' });
+  }
+
+  try {  
+    
+    const samePassword = await pool.query('SELECT password FROM "user" WHERE username = $1', [username]);
+    if (samePassword.rows.length > 0 && samePassword.rows[0].password === password) {
+      return res.status(400).json({ message: 'New password cannot be the same as the old password' });
+    }
+    
+    await pool.query(`
+      UPDATE "user" SET password = $1
+      WHERE username = $2
+    `, [password,username]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error during registration' });
+  }
+});
 
 
 module.exports = app;
