@@ -351,6 +351,7 @@ app.get('/available-slots/:day', async (req, res) => {
 
 // Check if order can be cancelled
 app.get("/can-cancel-order/:id", async (req, res) => {
+  console.log("Checking if order can be cancelled Id...", req.params.id);
   const orderId = req.params.id;
 
   try {
@@ -372,7 +373,7 @@ app.get("/can-cancel-order/:id", async (req, res) => {
     console.log("Time difference in minutes:", totalMinutes);
 
     if (totalMinutes > 60) {
-      return res.status(400).send("Cannot cancel after one hour.");
+      return res.status(200).send("Cannot cancel after one hour.");
     }
 
     res.status(200).send("Order can be cancelled.");
