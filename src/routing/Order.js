@@ -60,7 +60,7 @@ app.post('/add-order', async (req, res) => {
       console.error('Error inserting order:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+});
   
 // add to orde products table
 app.post('/add-order-products', async (req, res) => {
@@ -296,8 +296,7 @@ app.delete("/cancel-order/:id", async (req, res) => {
     // if (err.code === '23503') {
     //   return res.status(400).send("Cannot cancel order because it's still referenced in order_product.");
     }
-  });
-
+});
 
 
 app.get('/missing-delivery-days', async (req, res) => {
@@ -347,7 +346,6 @@ app.get('/available-slots/:day', async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 
 // Check if order can be cancelled
 app.get("/can-cancel-order/:id", async (req, res) => {

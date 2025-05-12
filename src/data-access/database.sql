@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "manager" (
        ('What was your first pet''s name?'),
        ('What is the name of your elementary school?');
 
+
 -- Create Categort table
 CREATE TABLE IF NOT EXISTS "category"(
         id SERIAL PRIMARY KEY,
