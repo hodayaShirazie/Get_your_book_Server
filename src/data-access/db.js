@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 
 // Create a new pool instance
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Use the connection string .env file
+  connectionString: process.env.DATABASE_URL, 
   ssl: {
     rejectUnauthorized: false 
   }

@@ -15,7 +15,6 @@ app.post('/register', async (req, res) => {
         return res.status(400).json({ message: 'Username already taken, please choose another' });
       }
   
-      // const hashedPassword = await bcrypt.hash(password, 10);
       await pool.query(`
         INSERT INTO "user" (username, password, security_question_id, security_answer)
         VALUES ($1, $2, $3, $4)
@@ -23,8 +22,7 @@ app.post('/register', async (req, res) => {
   
       res.json({ success: true });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error during registration' });
+      res.status(500).json({ message: 'Server error during registration', err });
     }
 });
 
@@ -47,10 +45,7 @@ app.post('/login', async (req, res) => {
             if (user.password !== password) {
                 return res.status(401).json({ message: 'Invalid username or password' });
             }
-  
-  
-            // const token = jwt.sign({ username: user.username }, 'Hodaya-secret-key', { expiresIn: '1h' });
-  
+    
             // User found, return success and role as 'customer'
             return res.status(200).json({
                 success: true,
@@ -84,8 +79,7 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid username or password' });
   
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'System error' });
+        res.status(500).json({ message: 'System error', err });
     }
 });
   
@@ -95,8 +89,7 @@ app.get('/security-questions', async (req, res) => {
       const result = await pool.query('SELECT id, question FROM security_question');
       res.json(result.rows);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error loading security questions' });
+      res.status(500).json({ message: 'Server error loading security questions', err });
     }
 });
 
@@ -117,8 +110,7 @@ app.get('/security-question/:username', async (req, res) => {
   
       res.json({ question: result.rows[0].question });
     } catch (error) {
-      console.error('Security question fetch error:', error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: 'Security question fetch error:', error });
     }
 });
 
@@ -146,7 +138,6 @@ app.post('/recover-password', async (req, res) => {
       res.json({ success: true, password: user.password });
   
     } catch (error) {
-      console.error('Password recovery error:', error);
       res.status(500).json({ success: false });
     }
 });
@@ -172,8 +163,7 @@ app.post('/reset-password', async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Server error during registration', err });
   }
 });
 

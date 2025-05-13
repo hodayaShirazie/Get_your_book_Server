@@ -14,7 +14,6 @@ const initDb = async () => {
       );
     `);
 
-    console.log("Table 'security_question' created.");
 
     // // Insert 3 rows into SecurityQuestion
     // await pool.query(`
@@ -24,7 +23,6 @@ const initDb = async () => {
     //   ('What is the name of your elementary school?');
     // `);
 
-    console.log("Default security questions inserted.");
 
     // Create User table
     await pool.query(`
@@ -37,8 +35,6 @@ const initDb = async () => {
       );
     `);
 
-    console.log("Table 'user' created.");
-
     // Create Manager table
     await pool.query(`
         CREATE TABLE IF NOT EXISTS "manager" (
@@ -47,8 +43,6 @@ const initDb = async () => {
         password TEXT NOT NULL
       );
     `);
-
-    console.log("Table 'manager' created.");
 
 
     // // Insert default manager
@@ -65,8 +59,6 @@ const initDb = async () => {
           category TEXT UNIQUE NOT NULL
       );      
     `);
-
-    console.log("Table 'category' created.");
 
     // // Insert default categories
     // await pool.query(`
@@ -95,9 +87,7 @@ const initDb = async () => {
         );
     `);
 
-    
-    console.log("Table 'product' created.");
-
+  
 
     // Create orders table 
     await pool.query(`
@@ -114,7 +104,6 @@ const initDb = async () => {
           time_slot_delivery VARCHAR(10) CHECK (time_slot_delivery IN ('morning', 'afternoon', 'evening'))
       );
     `);
-    console.log("Table 'orders' created.");
 
     //Create order_product table
     await pool.query(`
@@ -128,11 +117,9 @@ const initDb = async () => {
         
         FOREIGN KEY (user_id) REFERENCES "user"(id),
         FOREIGN KEY (order_id) REFERENCES "orders"(id),
-        FOREIGN KEY (product_id) REFERENCES "product"(id)
-      );
+        FOREIGN KEY (product_id) REFERENCES "product"(id) ON DELETE CASCADE
+        );
     `);
-
-    console.log("Table 'order_product' created.");
 
 
     // Create available_delivery_times table
@@ -147,9 +134,6 @@ const initDb = async () => {
         evening_available BOOLEAN DEFAULT FALSE
     );`)
 
-    console.log("Table 'available_delivery_times' created.");
-
-
     // Create shopping_cart table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS shopping_cart (
@@ -160,11 +144,10 @@ const initDb = async () => {
         PRIMARY KEY (user_id, book_id),
     
         FOREIGN KEY (user_id) REFERENCES "user"(id),
-        FOREIGN KEY (book_id) REFERENCES "product"(id)
-      );
+        FOREIGN KEY (book_id) REFERENCES "product"(id) ON DELETE CASCADE
+        );
     `);
 
-    console.log("Table 'shopping_cart' created.");
 
     // Create book_rating table
     await pool.query(`
@@ -176,12 +159,9 @@ const initDb = async () => {
           PRIMARY KEY (user_id, book_id),
 
           FOREIGN KEY (user_id) REFERENCES "user"(id),
-          FOREIGN KEY (book_id) REFERENCES "product"(id)
-      );
+          FOREIGN KEY (book_id) REFERENCES "product"(id) ON DELETE CASCADE
+          );
     `);
-
-    console.log("Table 'book_rating' created.");
-
     
     // Create wish_list table
     await pool.query(`
@@ -192,12 +172,9 @@ const initDb = async () => {
           PRIMARY KEY (user_id, book_id),
 
           FOREIGN KEY (user_id) REFERENCES "user"(id),
-          FOREIGN KEY (book_id) REFERENCES "product"(id)
-      );
+          FOREIGN KEY (book_id) REFERENCES "product"(id) ON DELETE CASCADE
+          );
     `);
-
-    console.log("Table 'wish_list' created.");
-
 
 
 
