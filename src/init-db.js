@@ -128,8 +128,8 @@ const initDb = async () => {
         
         FOREIGN KEY (user_id) REFERENCES "user"(id),
         FOREIGN KEY (order_id) REFERENCES "orders"(id),
-        FOREIGN KEY (product_id) REFERENCES "product"(id)
-      );
+        FOREIGN KEY (product_id) REFERENCES "product"(id) ON DELETE CASCADE
+        );
     `);
 
     console.log("Table 'order_product' created.");
@@ -160,8 +160,8 @@ const initDb = async () => {
         PRIMARY KEY (user_id, book_id),
     
         FOREIGN KEY (user_id) REFERENCES "user"(id),
-        FOREIGN KEY (book_id) REFERENCES "product"(id)
-      );
+        FOREIGN KEY (book_id) REFERENCES "product"(id) ON DELETE CASCADE
+        );
     `);
 
     console.log("Table 'shopping_cart' created.");
@@ -176,8 +176,8 @@ const initDb = async () => {
           PRIMARY KEY (user_id, book_id),
 
           FOREIGN KEY (user_id) REFERENCES "user"(id),
-          FOREIGN KEY (book_id) REFERENCES "product"(id)
-      );
+          FOREIGN KEY (book_id) REFERENCES "product"(id) ON DELETE CASCADE
+          );
     `);
 
     console.log("Table 'book_rating' created.");
@@ -192,8 +192,8 @@ const initDb = async () => {
           PRIMARY KEY (user_id, book_id),
 
           FOREIGN KEY (user_id) REFERENCES "user"(id),
-          FOREIGN KEY (book_id) REFERENCES "product"(id)
-      );
+          FOREIGN KEY (book_id) REFERENCES "product"(id) ON DELETE CASCADE
+          );
     `);
 
     console.log("Table 'wish_list' created.");

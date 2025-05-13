@@ -95,7 +95,6 @@ try {
 
     // Check if the new username and password are the same as the current ones
     const currentPassword = result.rows[0].password;
-    console.log('current username, current password, new username, new password:', currentUsername, currentPassword, newUsername, newPassword);
     if (currentPassword === newPassword && currentUsername === newUsername) {
     return res.status(400).json({ message: 'No changes detected in provided credentials.' });
     }
