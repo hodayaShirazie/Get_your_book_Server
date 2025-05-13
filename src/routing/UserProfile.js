@@ -29,7 +29,6 @@ app.get('/get-user-profile/:username/:role', async (req, res) => {
         }
       });
     } catch (err) {
-      console.error('Error retrieving user profile:', err);
       res.status(500).json({ message: 'Server error during profile retrieval' });
     }
   }
@@ -54,11 +53,10 @@ app.get('/get-user-profile/:username/:role', async (req, res) => {
         }
       });
     } catch (err) {
-      console.error('Error retrieving user profile:', err);
       res.status(500).json({ message: 'Server error during profile retrieval' });
     }
   }
-  });
+});
   
 // Update user profile
 app.post('/update-profile', async (req, res) => {
@@ -108,10 +106,9 @@ try {
     res.status(200).json({ success: true, message: 'Profile updated successfully' });
 
 } catch (error) {
-    console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Server error during profile update' });
 }
 });
 
+
 module.exports = app;
-  
