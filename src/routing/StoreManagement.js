@@ -2,12 +2,7 @@ const express = require('express')
 const pool = require('../data-access/db');
 const app = express.Router();
 
-/*
-Number of Registered Users
-Number of Products
-Number of Sells
-
-*/
+// get statistics
 app.get("/statistics", async (req, res) => {
     const { range } = req.query;
   
@@ -39,16 +34,13 @@ app.get("/statistics", async (req, res) => {
         revenue: revenueQuery.rows[0].sum || 0
       });
     } catch (err) {
-      console.error("Error fetching statistics:", err);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Error fetching statistics:", err });
     }
-  });
+});
 
-
+// add times for delivery
 app.post('/api/delivery-days', async (req, res) => {
   const { deliveryDays } = req.body;
-
-  console.log("Received deliveryDays:", deliveryDays);
 
   try {
     
@@ -69,12 +61,11 @@ app.post('/api/delivery-days', async (req, res) => {
 
     res.status(200).send('Delivery days updated successfully');
   } catch (err) {
-    console.error('Error saving delivery days:', err);
     res.status(500).send('Failed to update delivery days');
   }
 });
 
-
+// get delivery days
 app.get('/api/delivery-days', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -96,13 +87,11 @@ app.get('/api/delivery-days', async (req, res) => {
 
     res.json({ deliveryDays: formatted });
   } catch (error) {
-    console.error('Failed to fetch delivery days:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch delivery days:', error);
   }
 });
 
-/////////////////////////
-
+// get available delivery days
 app.get('/available-delivery-days', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -118,12 +107,11 @@ app.get('/available-delivery-days', async (req, res) => {
 
     res.json({ validDeliveryDays: validDays });
   } catch (error) {
-    console.error('Failed to fetch delivery days:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch delivery days:', error);
   }
 });
 
-
+// get unavailable delivery times
 app.get('/unavailable-delivery-times', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -145,12 +133,11 @@ app.get('/unavailable-delivery-times', async (req, res) => {
 
     res.json({ unavailableDeliveryTimes: formatted });
   } catch (error) {
-    console.error('Failed to fetch unavailable delivery times:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch unavailable delivery times:', error);
   }
 });
 
-
+// get missing delivery days
 app.get('/missing-delivery-days', async (req, res) => {
   try {
     const allDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -166,12 +153,9 @@ app.get('/missing-delivery-days', async (req, res) => {
 
     res.json({ missingDeliveryDays: missingDays });
   } catch (error) {
-    console.error('Failed to fetch missing delivery days:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch missing delivery days:', error);
   }
 });
-
-
 
 
 module.exports = app;

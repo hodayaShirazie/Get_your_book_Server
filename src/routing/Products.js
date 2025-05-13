@@ -28,12 +28,11 @@ app.post('/add-product', upload.single('image'), async (req, res) => {
   
       res.status(200).json({ message: 'Product added successfully' });
     } catch (error) {
-      console.error('Error adding product:', error);
       res.status(500).json({ error: 'Server error while adding product' });
     }
 });
   
-
+//get all products
 app.get('/products', async (req, res) => {
 try {
     const result = await pool.query('SELECT id, name, price, image, category_id FROM product ORDER BY created_at DESC');
@@ -46,11 +45,11 @@ try {
     }));
     res.json(products);
 } catch (err) {
-    console.error('Failed to fetch products', err);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch products', err);
 }
 });
 
+//get product by id
 app.get('/products-all/:id', async (req, res) => {
 const { id } = req.params;
 
@@ -79,8 +78,7 @@ try {
 
     res.json(productData);
 } catch (err) {
-    console.error('Failed to fetch product by ID', err);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch product by ID', err);
 }
 });
   
@@ -154,8 +152,7 @@ try {
 
     res.status(200).json({ message: 'Product updated successfully' });
 } catch (error) {
-    console.error('Failed to update product:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to update product:', error);
 }
 });
 
@@ -175,8 +172,7 @@ try {
 
     res.status(200).json({ message: 'Product deleted successfully.' });
 } catch (error) {
-    console.error('Failed to delete product:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to delete product:', error);
 }
 });
 
@@ -198,10 +194,8 @@ app.get('/search-books', async (req, res) => {
         }));
         res.json(products);
     } catch (err) {
-        console.error('Failed to fetch products', err);
-        res.status(500).send('Server error');
+        res.status(500).send('Failed to fetch products', err);
     }
 });
   
-
 module.exports = app;

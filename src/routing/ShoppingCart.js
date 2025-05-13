@@ -46,7 +46,6 @@ app.post('/add-to-shopping-cart', async (req, res) => {
 
     res.status(200).json({ message: 'Product added to shopping cart successfully' });
   } catch (error) {
-    console.error('Error adding to cart:', error);
     res.status(500).json({ message: 'Server error while adding to cart' });
   }
 });
@@ -100,7 +99,6 @@ app.post('/remove-from-shopping-cart', async (req, res) => {
 
     res.status(200).json({ message: 'Product quantity updated or removed from cart successfully' });
   } catch (error) {
-    console.error('Error removing from cart:', error);
     res.status(500).json({ message: 'Server error while removing from cart' });
   }
 });
@@ -142,8 +140,7 @@ app.get('/shopping-cart/:username', async (req, res) => {
     
     res.json(products);
   } catch (error) {
-    console.error('Error retrieving cart:', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send('Error retrieving cart:', error);
   }
 });
 
@@ -175,7 +172,6 @@ app.delete('/shopping-cart/:username', async (req, res) => {
 
     res.status(200).json({ message: 'Products removed from shopping cart successfully' });
   } catch (error) {
-    console.error('Error removing from cart:', error);
     res.status(500).json({ message: 'Server error while removing from cart' });
   }
 });

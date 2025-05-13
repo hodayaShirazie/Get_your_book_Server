@@ -29,7 +29,6 @@ app.get('/get-user-profile/:username/:role', async (req, res) => {
         }
       });
     } catch (err) {
-      console.error('Error retrieving user profile:', err);
       res.status(500).json({ message: 'Server error during profile retrieval' });
     }
   }
@@ -54,11 +53,10 @@ app.get('/get-user-profile/:username/:role', async (req, res) => {
         }
       });
     } catch (err) {
-      console.error('Error retrieving user profile:', err);
       res.status(500).json({ message: 'Server error during profile retrieval' });
     }
   }
-  });
+});
   
 // Update user profile
 app.post('/update-profile', async (req, res) => {
@@ -95,7 +93,6 @@ try {
 
     // Check if the new username and password are the same as the current ones
     const currentPassword = result.rows[0].password;
-    console.log('current username, current password, new username, new password:', currentUsername, currentPassword, newUsername, newPassword);
     if (currentPassword === newPassword && currentUsername === newUsername) {
     return res.status(400).json({ message: 'No changes detected in provided credentials.' });
     }
@@ -109,10 +106,9 @@ try {
     res.status(200).json({ success: true, message: 'Profile updated successfully' });
 
 } catch (error) {
-    console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Server error during profile update' });
 }
 });
 
+
 module.exports = app;
-  

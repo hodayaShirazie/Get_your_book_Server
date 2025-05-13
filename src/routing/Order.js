@@ -55,12 +55,11 @@ app.post('/add-order', async (req, res) => {
       const orderId = result.rows[0].id;
       console.log('New order ID:', orderId);
   
-      res.status(201).json({ orderId }); // Return the new order ID to the client
+      res.status(201).json({ orderId }); 
     } catch (error) {
-      console.error('Error inserting order:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+});
   
 // add to orde products table
 app.post('/add-order-products', async (req, res) => {
@@ -85,7 +84,6 @@ try {
 
     res.status(201).json(result.rows[0]);
 } catch (error) {
-    console.error('Error inserting order products:', error);
     res.status(500).json({ error: 'Internal Server Error' });
 }
 });
@@ -118,8 +116,7 @@ try {
 
     res.json(order);
 } catch (error) {
-    console.error('Error fetching order details:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Error fetching order details:', error });
 }
 });
 
@@ -138,8 +135,7 @@ try {
     
     res.json(orders);
 } catch (error) {
-    console.error('Error fetching all orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Error fetching all orders:', error });
 }
 });
 
@@ -148,7 +144,6 @@ app.put('/update-order-status/:orderId', async (req, res) => {
 const { orderId } = req.params;
 const { status } = req.body;
 
-console.log('SERVER Updating order status:', { orderId, status });
 
 try {
     const result = await pool.query(
@@ -159,13 +154,10 @@ try {
     if (result.rows.length === 0) {
     return res.status(404).json({ message: 'Order not found' });
     }
-    console.log('SERVER Updating order success:', { orderId, status });
-
 
     res.json(result.rows[0]);
 } catch (error) {
-    console.error('Error updating order status:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Error updating order status:', error });
 }
 
 });
@@ -198,8 +190,8 @@ app.get('/filtered-orders', async (req, res) => {
     const result = await pool.query(query, values);
     res.json(result.rows);
   } catch (error) {
-    console.error('Error filtering orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error();
+    res.status(500).json({ message: 'Error filtering orders:', error });
   }
 });
 
@@ -252,8 +244,7 @@ app.get('/user-orders/:username', async (req, res) => {
 
     res.json(orders);
   } catch (error) {
-    console.error('Error fetching user orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Error fetching user orders:', error });
   }
 });
 
@@ -293,13 +284,10 @@ app.delete("/cancel-order/:id", async (req, res) => {
 
     res.status(200).send("Order cancelled successfully.");
   } catch (err) {
-    // if (err.code === '23503') {
-    //   return res.status(400).send("Cannot cancel order because it's still referenced in order_product.");
     }
-  });
+});
 
-
-
+// Get missing delivery days
 app.get('/missing-delivery-days', async (req, res) => {
   try {
     const allDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -315,11 +303,11 @@ app.get('/missing-delivery-days', async (req, res) => {
 
     res.json({ missingDeliveryDays: missingDays });
   } catch (error) {
-    console.error('Failed to fetch missing delivery days:', error);
-    res.status(500).send('Server error');
+    res.status(500).send('Failed to fetch missing delivery days:', error);
   }
 });
 
+// Get available delivery slots for a specific day
 app.get('/available-slots/:day', async (req, res) => {
   try {
     const { day } = req.params;
@@ -343,11 +331,9 @@ app.get('/available-slots/:day', async (req, res) => {
 
     res.json({ availableSlots: slots });
   } catch (err) {
-    console.error("Error fetching available slots:", err);
-    res.status(500).send("Server error");
+    res.status(500).send("Error fetching available slots:", err);
   }
 });
-
 
 // Check if order can be cancelled
 app.get("/can-cancel-order/:id", async (req, res) => {
@@ -378,8 +364,7 @@ app.get("/can-cancel-order/:id", async (req, res) => {
 
     res.status(200).send("Order can be cancelled.");
   } catch (err) {
-    console.error("Error checking order cancellation:", err);
-    res.status(500).send("Server error.");
+    res.status(500).send("Error checking order cancellation:", err);
   }
 });
 

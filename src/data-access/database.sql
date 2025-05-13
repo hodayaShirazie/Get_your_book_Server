@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "manager" (
        ('What was your first pet''s name?'),
        ('What is the name of your elementary school?');
 
+
 -- Create Categort table
 CREATE TABLE IF NOT EXISTS "category"(
         id SERIAL PRIMARY KEY,
@@ -110,7 +111,7 @@ CREATE TABLE book_rating (
     PRIMARY KEY (user_id, book_id),
 
     FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (book_id) REFERENCES produc(id)
+    FOREIGN KEY (book_id) REFERENCES product(id)
 );
 
 --- create wish_list table ---
