@@ -25,6 +25,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.0.0",
-    "mocha": "^11.1.0"
+    "mocha": "^11.1.0",
+    "supertest": "^7.1.1"
   }
 }
