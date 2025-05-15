@@ -76,17 +76,41 @@ if (userResult.rows.length === 0) {
 
 const userId = userResult.rows[0].id;
 try {
+  
+    const stockResult = await pool.query(
+      `SELECT stock_quantity FROM product WHERE id = $1`,
+      [productId]
+    );
+    if (stockResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    const currentStock = parseInt(stockResult.rows[0].stock_quantity);
+    if (currentStock < quantity) {
+      return res.status(400).json({ message: 'Not enough stock' });
+    }
+
     const result = await pool.query(
-    `INSERT INTO order_product (user_id, order_id, product_id, quantity)
-        VALUES ($1, $2, $3, $4)`,
-    [userId, orderId, productId, quantity]
+      `INSERT INTO order_product (user_id, order_id, product_id, quantity)
+          VALUES ($1, $2, $3, $4)`,
+      [userId, orderId, productId, quantity]
+      );
+
+    await pool.query(
+      `UPDATE product
+       SET stock_quantity  = stock_quantity - $1
+       WHERE id = $2`,
+      [quantity, productId]
     );
 
-    res.status(201).json(result.rows[0]);
-} catch (error) {
+
+    res.status(201).json({ message: 'Product added to order and stock updated' });
+  } catch (error) {
+
     res.status(500).json({ error: 'Internal Server Error' });
 }
 });
+
+
 
 // Get specific order by orderId
 app.get('/order-products/:orderId', async (req, res) => {
