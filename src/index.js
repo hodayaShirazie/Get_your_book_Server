@@ -42,3 +42,7 @@ app.get('/ping', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 }); 
+
+
+// Export the entire Express app for testing with supertest
+module.exports = app;
