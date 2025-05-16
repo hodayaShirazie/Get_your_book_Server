@@ -157,11 +157,14 @@ try {
 });
 
 // Delete product
+
 app.delete('/delete-product/:id', async (req, res) => {
 const { id } = req.params;
+console.log("Received DELETE request for ID:", id);
 
 try {
     const result = await pool.query('DELETE FROM product WHERE id = $1 RETURNING *', [id]);
+    console.log("Result from DB:", result.rows);
 
     if (result.rowCount === 0) {
     return res.status(404).json({ message: 'Product not found.' });
