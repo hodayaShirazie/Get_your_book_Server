@@ -24,6 +24,23 @@ app.post('/add-to-shopping-cart', async (req, res) => {
 
     const userId = userResult.rows[0].id;
 
+     //  Check product stock
+     const stockResult = await pool.query(
+      'SELECT stock_quantity FROM product WHERE id = $1',
+      [productId]
+    );
+    if (stockResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    const stock = parseInt(stockResult.rows[0].stock_quantity);
+    console.log("Stock from DB:", stockResult.rows[0].stock_quantity);
+    console.log("Parsed stock:", stock);
+
+    if (isNaN(stock) || stock <= 0) {
+      return res.status(200).json({ message: 'Out of Stock' });
+    }
+
+    
     // Check if the product already exists in the user's cart
     const existingItem = await pool.query(
       'SELECT quantity FROM shopping_cart WHERE user_id = $1 AND book_id = $2',
@@ -124,7 +141,7 @@ app.get('/shopping-cart/:username', async (req, res) => {
 
     // Get the products in the user's shopping cart
     const result = await pool.query(
-      `SELECT p.id, p.name, p.price, sc.quantity, p.image 
+      `SELECT p.id, p.name, p.price, sc.quantity, p.stock_quantity, p.image 
        FROM shopping_cart sc
        JOIN product p ON sc.book_id = p.id
        WHERE sc.user_id = $1`,
