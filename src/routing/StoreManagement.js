@@ -2,41 +2,6 @@ const express = require('express')
 const pool = require('../data-access/db');
 const app = express.Router();
 
-// get statistics
-app.get("/statistics", async (req, res) => {
-    const { range } = req.query;
-  
-    let dateCondition = ""; 
-  
-    if (range === "lastMonth") {
-      dateCondition = "WHERE created_at >= NOW() - INTERVAL '1 month'";
-    } else if (range === "last3Months") {
-      dateCondition = "WHERE created_at >= NOW() - INTERVAL '3 months'";
-    }
-  
-    try {
-      const usersQuery = await pool.query("SELECT COUNT(*) FROM \"user\"");
-      const productsQuery = await pool.query(
-        `SELECT COUNT(*) FROM product ${dateCondition}`
-      );
-      const sellsQuery = await pool.query(
-        `SELECT COALESCE(SUM(sells), 0) FROM product ${dateCondition}`
-      );
-      const revenueQuery = await pool.query(
-        `SELECT SUM(sum_of_purchase) FROM orders`
-      );
-
-  
-      res.json({
-        users: parseInt(usersQuery.rows[0].count),
-        products: parseInt(productsQuery.rows[0].count),
-        sells: parseInt(sellsQuery.rows[0].coalesce),
-        revenue: revenueQuery.rows[0].sum || 0
-      });
-    } catch (err) {
-      res.status(500).json({ error: "Error fetching statistics:", err });
-    }
-});
 
 // add times for delivery
 app.post('/api/delivery-days', async (req, res) => {
@@ -156,6 +121,70 @@ app.get('/missing-delivery-days', async (req, res) => {
     res.status(500).send('Failed to fetch missing delivery days:', error);
   }
 });
+
+// get store statistics
+app.get('/statistics/:range', async (req, res) => {
+  try {
+    const { range } = req.params;
+    let startDate;
+
+    const now = new Date();
+    if (range === 'last-month') {
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    } else if (range === 'last-3-months') {
+      startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+    } else {
+      return res.status(400).json({ error: "Invalid range parameter" });
+    }
+
+    const statsQuery = `
+      SELECT 
+        COUNT(*) AS "totalPurchases",
+        COALESCE(SUM(sum_of_purchase), 0) AS "totalRevenue"
+      FROM "orders"
+      WHERE order_date >= $1 AND status = 'approved';
+    `;
+
+    const topProductQuery = `
+      SELECT 
+        p.id,
+        p.name,
+        SUM(op.quantity) AS quantity_sold
+      FROM order_product op
+      JOIN "orders" o ON op.order_id = o.id
+      JOIN product p ON op.product_id = p.id
+      WHERE o.order_date >= $1 AND o.status = 'approved'
+      GROUP BY p.id, p.name
+      ORDER BY quantity_sold DESC
+      LIMIT 1;
+    `;
+
+    const client = await pool.connect();
+
+    const statsResult = await client.query(statsQuery, [startDate]);
+    const topProductResult = await client.query(topProductQuery, [startDate]);
+
+    client.release();
+
+    const stats = statsResult.rows[0];
+    const topProduct = topProductResult.rows[0] || null;
+
+    res.json({
+      totalPurchases: parseInt(stats.totalPurchases, 10),
+      totalRevenue: parseFloat(stats.totalRevenue),
+      bestSellingBook: topProduct ? {
+        id: topProduct.id,
+        name: topProduct.name,
+        quantitySold: parseInt(topProduct.quantity_sold, 10),
+      } : null
+    });
+
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 module.exports = app;
