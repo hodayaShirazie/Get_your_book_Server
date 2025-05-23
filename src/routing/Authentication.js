@@ -6,10 +6,11 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const port = 3000;
-const serverUrl = `http://localhost:${port}`;
+// const serverUrl = `http://localhost:${port}`;
+const serverUrl = `https://get-your-book-client.onrender.com/:${port}`;
+
 app.use(express.static('public'));
 
-// const serverUrl = `https://get-your-book-client.onrender.com/:${port}`;
 
 
 // registration user
@@ -213,7 +214,7 @@ app.post('/forgot-password', async (req, res) => {
     resetTokens[token] = {
       username,
       email,
-      expiry: Date.now() + 3600000
+      expiry: Date.now() + 5600000
     };
 
     const resetLink = `${serverUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
@@ -254,7 +255,6 @@ app.post('/reset-password', bodyParser.urlencoded({ extended: true }), async (re
   }
 
   try {
-    // const hashed = bcrypt.hashSync(password, 10);
 
     console.log(`New password for user "${data.username}": ${password}`);  
 
@@ -266,7 +266,8 @@ app.post('/reset-password', bodyParser.urlencoded({ extended: true }), async (re
 
     delete resetTokens[token];
 
-    res.send('Password reset successfully');
+    res.send('Password reset successfully!<br/>Please login with your new password');
+
   } catch (err) {
     console.error('DB error:', err);
     res.status(500).send('Internal Server Error');
