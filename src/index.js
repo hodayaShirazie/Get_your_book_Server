@@ -1,8 +1,10 @@
 const express = require('express')
 const pool = require('./data-access/db');
 const cors = require('cors');
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
+const path = require('path');
+
 
 app.use(cors());
 app.use(express.json());
@@ -23,6 +25,9 @@ app.use(UserProfile);
 app.use(StoreManagement);
 
 
+
+
+
 // get about
 app.get('/about', (req, res) => {
   res.json({
@@ -38,11 +43,32 @@ app.get('/ping', (req, res) => {
   })
 })
 
+
 // server start
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 }); 
 
 
+
+
 // Export the entire Express app for testing with supertest
 module.exports = app;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

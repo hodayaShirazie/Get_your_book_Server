@@ -1,10 +1,19 @@
 const express = require('express')
 const pool = require('../data-access/db');
 const app = express.Router();
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const bodyParser = require('body-parser');
+const port = 3000;
+const serverUrl = `http://localhost:${port}`;
+app.use(express.static('public'));
+
+// const serverUrl = `https://get-your-book-client.onrender.com/:${port}`;
 
 
 // registration user
-app.post('/register', async (req, res) => {
+app.post('/register-OLD', async (req, res) => {
     const { username, password, securityQuestionId, securityAnswer } = req.body;
     if (!username || !password || !securityQuestionId || !securityAnswer) {
       return res.status(400).json({ message: 'Missing fields' });
@@ -25,6 +34,40 @@ app.post('/register', async (req, res) => {
       res.status(500).json({ message: 'Server error during registration', err });
     }
 });
+
+app.post('/register', async (req, res) => {
+  const { username, email, password, securityQuestionId, securityAnswer } = req.body;
+
+  if (!username || !email || !password || !securityQuestionId || !securityAnswer) {
+    return res.status(400).json({ message: 'Missing fields' });
+  }
+
+  try {
+    const userExists = await pool.query('SELECT id FROM "user" WHERE username = $1', [username]);
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ message: 'Username already taken, please choose another' });
+    }
+
+    const emailExists = await pool.query('SELECT id FROM "user" WHERE email = $1', [email]);
+    if (emailExists.rows.length > 0) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
+
+    await pool.query(`
+      INSERT INTO "user" (username, password, email, security_question_id, security_answer)
+      VALUES ($1, $2, $3, $4, $5)
+    `, [username, password, email, securityQuestionId, securityAnswer]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ message: 'Server error during registration' });
+  }
+});
+
+
+
+
 
 // login user
 app.post('/login', async (req, res) => {
@@ -142,30 +185,283 @@ app.post('/recover-password', async (req, res) => {
     }
 });
 
-// Reset password
-app.post('/reset-password', async (req, res) => {
-  const { username, password} = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Missing fields' });
-  }
 
-  try {  
-    
-    const samePassword = await pool.query('SELECT password FROM "user" WHERE username = $1', [username]);
-    if (samePassword.rows.length > 0 && samePassword.rows[0].password === password) {
-      return res.status(400).json({ message: 'New password cannot be the same as the old password' });
-    }
-    
-    await pool.query(`
-      UPDATE "user" SET password = $1
-      WHERE username = $2
-    `, [password,username]);
-
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error during registration', err });
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'info.getyourbook@gmail.com',
+    pass: 'mlya kgio qvuf dftu' 
   }
 });
+
+
+const resetTokens = {}; 
+app.post('/forgot-password', async (req, res) => {
+  const { username } = req.body;  
+
+  try {
+    const result = await pool.query('SELECT email FROM "user" WHERE username = $1', [username]);
+
+    if (result.rows.length === 0) {
+      return res.status(400).send('User not found');
+    }
+
+    const email = result.rows[0].email; 
+
+    const token = crypto.randomBytes(20).toString('hex');
+
+    resetTokens[token] = {
+      username,
+      email,
+      expiry: Date.now() + 3600000
+    };
+
+    const resetLink = `${serverUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+    const mailOptions = {
+      from: 'info.getyourbook@gmail.com',
+      to: email,
+      subject: 'Password Reset',
+      replyTo: 'no-reply@getyourbook.com',
+      html: `<p>To reset your password, click the link below:</p><a href="${resetLink}">${resetLink}</a>`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Failed to send email:', error);
+        return res.status(500).send('Failed to send email');
+      }
+      res.send('Password reset email sent successfully');
+    });
+
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+
+app.post('/reset-password', bodyParser.urlencoded({ extended: true }), async (req, res) => {
+  const { token, email, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).send('Passwords do not match');
+  }
+
+  const data = resetTokens[token];
+  if (!data || data.expiry < Date.now() || data.email !== email) {
+    return res.status(400).send('Token expired or invalid');
+  }
+
+  try {
+    // const hashed = bcrypt.hashSync(password, 10);
+
+    console.log(`New password for user "${data.username}": ${password}`);  
+
+    await pool.query(
+      'UPDATE "user" SET password = $1 WHERE username = $2',
+      [password, data.username]
+    );
+    
+
+    delete resetTokens[token];
+
+    res.send('Password reset successfully');
+  } catch (err) {
+    console.error('DB error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+app.get('/reset-password', (req, res) => {
+  const { token } = req.query;
+  const data = resetTokens[token];
+  const tokenValid = data && data.expiry > Date.now();
+
+  if (!tokenValid) {
+    return res.send('<p>Invalid or expired token.</p>');
+  }
+
+  const email = data.email;
+
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Reset Password</title>
+      <link rel="stylesheet" href="/styles/reset.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          background-image: url('/background-book.jpg');
+          background-size: cover;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          font-family: sans-serif;
+        }
+
+        .overlay {
+          position: absolute;
+          inset: 0;
+          background-color: rgba(255, 255, 255, 0.6);
+          z-index: 1;
+        }
+
+        .recovery-form {
+          position: relative;
+          background: white;
+          padding: 30px;
+          border-radius: 15px;
+          box-shadow: 0 0 15px rgba(0,0,0,0.2);
+          width: 350px;
+          text-align: center;
+          z-index: 2;
+        }
+
+        .recovery-form h2 {
+          color: #2d4739;
+          margin-bottom: 20px;
+        }
+
+        .recovery-form label {
+          display: block;
+          text-align: left;
+          margin-bottom: 5px;
+          font-weight: bold;
+          color: #2d4739;
+        }
+
+        .recovery-form input {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 15px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+        }
+
+        .submit-button {
+          background-color: #2d4739;
+          color: white;
+          padding: 10px;
+          width: 100%;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+        }
+
+        .submit-button:hover {
+          background-color: #416353;
+        }
+
+        .password-input {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .password-input input {
+          flex: 1;
+          padding-right: 30px;
+        }
+
+        .password-input span {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+          color: #666;
+          font-size: 0.9rem;
+        }
+
+        .error-message {
+          color: red;
+          margin-top: 10px;
+          font-size: 14px;
+        }
+      </style>
+      <script>
+        function togglePassword(id, iconId) {
+          const input = document.getElementById(id);
+          const icon = document.getElementById(iconId);
+          if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+          } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+          }
+        }
+
+        function validateForm(event) {
+          event.preventDefault();
+
+          const password = document.getElementById("password").value;
+          const confirmPassword = document.getElementById("confirmPassword").value;
+          const errorDiv = document.getElementById("error-message");
+
+          if (password !== confirmPassword) {
+            errorDiv.textContent = "Passwords do not match";
+            return;
+          }
+
+          if (password.length < 8) {
+            errorDiv.textContent = "Password must be at least 8 characters long";
+            return;
+          }
+
+          if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            errorDiv.textContent = "Password must contain at least one special character";
+            return;
+          }
+
+          // אם הכל תקין - שולחים את הטופס
+          event.target.submit();
+        }
+      </script>
+    </head>
+    <body>
+      <div class="overlay"></div>
+      <form class="recovery-form" method="POST" action="/reset-password" onsubmit="validateForm(event)">
+        <h2>Set a new password</h2>
+
+        <input type="hidden" name="token" value="${token}" />
+        <input type="hidden" name="email" value="${email}" />
+
+        <label>New Password</label>
+        <div class="password-input">
+          <input id="password" name="password" type="password" required />
+          <span onclick="togglePassword('password', 'eyeNew')">
+            <i id="eyeNew" class="fa fa-eye"></i>
+          </span>
+        </div>
+
+        <label>Confirm Password</label>
+        <div class="password-input">
+          <input id="confirmPassword" name="confirmPassword" type="password" required />
+          <span onclick="togglePassword('confirmPassword', 'eyeConfirm')">
+            <i id="eyeConfirm" class="fa fa-eye"></i>
+          </span>
+        </div>
+
+        <button type="submit" class="submit-button">Reset Password</button>
+        <div id="error-message" class="error-message"></div>
+      </form>
+    </body>
+    </html>
+  `);
+});
+
+
 
 
 module.exports = app;

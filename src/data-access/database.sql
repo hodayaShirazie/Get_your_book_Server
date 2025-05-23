@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS "user" (
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         security_question_id INTEGER NOT NULL REFERENCES "security_question"(id),
-        security_answer TEXT NOT NULL
+        security_answer TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
 );
 
 -- Create Manager table

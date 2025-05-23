@@ -110,8 +110,6 @@ try {
 }
 });
 
-
-
 // Get specific order by orderId
 app.get('/order-products/:orderId', async (req, res) => {
 const { orderId } = req.params;
