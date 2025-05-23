@@ -530,180 +530,182 @@ app.get('/reset-password', async (req, res) => {
 
     const email = result.rows[0].email;
 
-    res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Reset Password</title>
-      <link rel="stylesheet" href="/styles/reset.css">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-      <style>
-        body {
-          margin: 0;
-          padding: 0;
-          background-image: url('/background-book.jpg');
-          background-size: cover;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: relative;
-          font-family: sans-serif;
-        }
+  //   res.send(`
+  //   <!DOCTYPE html>
+  //   <html>
+  //   <head>
+  //     <title>Reset Password</title>
+  //     <link rel="stylesheet" href="/styles/reset.css">
+  //     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  //     <style>
+  //       body {
+  //         margin: 0;
+  //         padding: 0;
+  //         background-image: url('/background-book.jpg');
+  //         background-size: cover;
+  //         height: 100vh;
+  //         display: flex;
+  //         justify-content: center;
+  //         align-items: center;
+  //         position: relative;
+  //         font-family: sans-serif;
+  //       }
 
-        .overlay {
-          position: absolute;
-          inset: 0;
-          background-color: rgba(255, 255, 255, 0.6);
-          z-index: 1;
-        }
+  //       .overlay {
+  //         position: absolute;
+  //         inset: 0;
+  //         background-color: rgba(255, 255, 255, 0.6);
+  //         z-index: 1;
+  //       }
 
-        .recovery-form {
-          position: relative;
-          background: white;
-          padding: 30px;
-          border-radius: 15px;
-          box-shadow: 0 0 15px rgba(0,0,0,0.2);
-          width: 350px;
-          text-align: center;
-          z-index: 2;
-        }
+  //       .recovery-form {
+  //         position: relative;
+  //         background: white;
+  //         padding: 30px;
+  //         border-radius: 15px;
+  //         box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  //         width: 350px;
+  //         text-align: center;
+  //         z-index: 2;
+  //       }
 
-        .recovery-form h2 {
-          color: #2d4739;
-          margin-bottom: 20px;
-        }
+  //       .recovery-form h2 {
+  //         color: #2d4739;
+  //         margin-bottom: 20px;
+  //       }
 
-        .recovery-form label {
-          display: block;
-          text-align: left;
-          margin-bottom: 5px;
-          font-weight: bold;
-          color: #2d4739;
-        }
+  //       .recovery-form label {
+  //         display: block;
+  //         text-align: left;
+  //         margin-bottom: 5px;
+  //         font-weight: bold;
+  //         color: #2d4739;
+  //       }
 
-        .recovery-form input {
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 15px;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-        }
+  //       .recovery-form input {
+  //         width: 100%;
+  //         padding: 10px;
+  //         margin-bottom: 15px;
+  //         border: 1px solid #ccc;
+  //         border-radius: 8px;
+  //       }
 
-        .submit-button {
-          background-color: #2d4739;
-          color: white;
-          padding: 10px;
-          width: 100%;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 16px;
-        }
+  //       .submit-button {
+  //         background-color: #2d4739;
+  //         color: white;
+  //         padding: 10px;
+  //         width: 100%;
+  //         border: none;
+  //         border-radius: 8px;
+  //         cursor: pointer;
+  //         font-size: 16px;
+  //       }
 
-        .submit-button:hover {
-          background-color: #416353;
-        }
+  //       .submit-button:hover {
+  //         background-color: #416353;
+  //       }
 
-        .password-input {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
+  //       .password-input {
+  //         position: relative;
+  //         display: flex;
+  //         align-items: center;
+  //       }
 
-        .password-input input {
-          flex: 1;
-          padding-right: 30px;
-        }
+  //       .password-input input {
+  //         flex: 1;
+  //         padding-right: 30px;
+  //       }
 
-        .password-input span {
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          cursor: pointer;
-          color: #666;
-          font-size: 0.9rem;
-        }
+  //       .password-input span {
+  //         position: absolute;
+  //         right: 10px;
+  //         top: 50%;
+  //         transform: translateY(-50%);
+  //         cursor: pointer;
+  //         color: #666;
+  //         font-size: 0.9rem;
+  //       }
 
-        .error-message {
-          color: red;
-          margin-top: 10px;
-          font-size: 14px;
-        }
-      </style>
-      <script>
-        function togglePassword(id, iconId) {
-          const input = document.getElementById(id);
-          const icon = document.getElementById(iconId);
-          if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash");
-          } else {
-            input.type = "password";
-            icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye");
-          }
-        }
+  //       .error-message {
+  //         color: red;
+  //         margin-top: 10px;
+  //         font-size: 14px;
+  //       }
+  //     </style>
+  //     <script>
+  //       function togglePassword(id, iconId) {
+  //         const input = document.getElementById(id);
+  //         const icon = document.getElementById(iconId);
+  //         if (input.type === "password") {
+  //           input.type = "text";
+  //           icon.classList.remove("fa-eye");
+  //           icon.classList.add("fa-eye-slash");
+  //         } else {
+  //           input.type = "password";
+  //           icon.classList.remove("fa-eye-slash");
+  //           icon.classList.add("fa-eye");
+  //         }
+  //       }
 
-        function validateForm(event) {
-          event.preventDefault();
+  //       function validateForm(event) {
+  //         event.preventDefault();
 
-          const password = document.getElementById("password").value;
-          const confirmPassword = document.getElementById("confirmPassword").value;
-          const errorDiv = document.getElementById("error-message");
+  //         const password = document.getElementById("password").value;
+  //         const confirmPassword = document.getElementById("confirmPassword").value;
+  //         const errorDiv = document.getElementById("error-message");
 
-          if (password !== confirmPassword) {
-            errorDiv.textContent = "Passwords do not match";
-            return;
-          }
+  //         if (password !== confirmPassword) {
+  //           errorDiv.textContent = "Passwords do not match";
+  //           return;
+  //         }
 
-          if (password.length < 8) {
-            errorDiv.textContent = "Password must be at least 8 characters long";
-            return;
-          }
+  //         if (password.length < 8) {
+  //           errorDiv.textContent = "Password must be at least 8 characters long";
+  //           return;
+  //         }
 
-          if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-            errorDiv.textContent = "Password must contain at least one special character";
-            return;
-          }
+  //         if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+  //           errorDiv.textContent = "Password must contain at least one special character";
+  //           return;
+  //         }
 
-          // אם הכל תקין - שולחים את הטופס
-          event.target.submit();
-        }
-      </script>
-    </head>
-    <body>
-      <div class="overlay"></div>
-      <form class="recovery-form" method="POST" action="/reset-password" onsubmit="validateForm(event)">
-        <h2>Set a new password</h2>
+  //         // אם הכל תקין - שולחים את הטופס
+  //         event.target.submit();
+  //       }
+  //     </script>
+  //   </head>
+  //   <body>
+  //     <div class="overlay"></div>
+  //     <form class="recovery-form" method="POST" action="/reset-password" onsubmit="validateForm(event)">
+  //       <h2>Set a new password</h2>
 
-        <input type="hidden" name="token" value="${token}" />
-        <input type="hidden" name="email" value="${email}" />
+  //       <input type="hidden" name="token" value="${token}" />
+  //       <input type="hidden" name="email" value="${email}" />
 
-        <label>New Password</label>
-        <div class="password-input">
-          <input id="password" name="password" type="password" required />
-          <span onclick="togglePassword('password', 'eyeNew')">
-            <i id="eyeNew" class="fa fa-eye"></i>
-          </span>
-        </div>
+  //       <label>New Password</label>
+  //       <div class="password-input">
+  //         <input id="password" name="password" type="password" required />
+  //         <span onclick="togglePassword('password', 'eyeNew')">
+  //           <i id="eyeNew" class="fa fa-eye"></i>
+  //         </span>
+  //       </div>
 
-        <label>Confirm Password</label>
-        <div class="password-input">
-          <input id="confirmPassword" name="confirmPassword" type="password" required />
-          <span onclick="togglePassword('confirmPassword', 'eyeConfirm')">
-            <i id="eyeConfirm" class="fa fa-eye"></i>
-          </span>
-        </div>
+  //       <label>Confirm Password</label>
+  //       <div class="password-input">
+  //         <input id="confirmPassword" name="confirmPassword" type="password" required />
+  //         <span onclick="togglePassword('confirmPassword', 'eyeConfirm')">
+  //           <i id="eyeConfirm" class="fa fa-eye"></i>
+  //         </span>
+  //       </div>
 
-        <button type="submit" class="submit-button">Reset Password</button>
-        <div id="error-message" class="error-message"></div>
-      </form>
-    </body>
-    </html>
-  `);
+  //       <button type="submit" class="submit-button">Reset Password</button>
+  //       <div id="error-message" class="error-message"></div>
+  //     </form>
+  //   </body>
+  //   </html>
+  // `);
+
+  res.send(renderResetPage({ token, email }));
 
   } catch (err) {
     console.error('Token verification error:', err);
@@ -736,13 +738,207 @@ app.post('/reset-password', bodyParser.urlencoded({ extended: true }), async (re
 
     await pool.query('DELETE FROM "password_reset_tokens" WHERE token = $1', [token]);
 
-    res.send('Password reset successfully!<br/>Please login with your new password');
+    // res.send('Password reset successfully!<br/>Please login with your new password');
+    res.send(renderResetPage({ token: '', email: '', success: 'Password reset successfully! Please login with your new password.' }));
 
   } catch (err) {
     console.error('Reset error:', err);
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+
+///////////////////////////
+
+function renderResetPage({ token, email, success = '', error = '' }) {
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Reset Password</title>
+    <link rel="stylesheet" href="/styles/reset.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-image: url('/background-book.jpg');
+        background-size: cover;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        font-family: sans-serif;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(255, 255, 255, 0.6);
+        z-index: 1;
+      }
+
+      .recovery-form {
+        position: relative;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        width: 350px;
+        text-align: center;
+        z-index: 2;
+      }
+
+      .recovery-form h2 {
+        color: #2d4739;
+        margin-bottom: 20px;
+      }
+
+      .recovery-form label {
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #2d4739;
+      }
+
+      .recovery-form input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+
+      .submit-button {
+        background-color: #2d4739;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .submit-button:hover {
+        background-color: #416353;
+      }
+
+      .password-input {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .password-input input {
+        flex: 1;
+        padding-right: 30px;
+      }
+
+      .password-input span {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .success-message {
+        color: green;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .error-message {
+        color: red;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+    </style>
+    <script>
+      function togglePassword(id, iconId) {
+        const input = document.getElementById(id);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        } else {
+          input.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+        }
+      }
+
+      function validateForm(event) {
+        event.preventDefault();
+
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const errorDiv = document.getElementById("error-message");
+
+        errorDiv.textContent = "";
+
+        if (password !== confirmPassword) {
+          errorDiv.textContent = "Passwords do not match";
+          return;
+        }
+
+        if (password.length < 8) {
+          errorDiv.textContent = "Password must be at least 8 characters long";
+          return;
+        }
+
+        if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
+          errorDiv.textContent = "Password must contain at least one special character";
+          return;
+        }
+
+        // אם הכל תקין - שולחים את הטופס
+        event.target.submit();
+      }
+    </script>
+  </head>
+  <body>
+    <div class="overlay"></div>
+    <form class="recovery-form" method="POST" action="/reset-password" onsubmit="validateForm(event)">
+      <h2>Set a new password</h2>
+
+      <input type="hidden" name="token" value="${token}" />
+      <input type="hidden" name="email" value="${email}" />
+
+      <label>New Password</label>
+      <div class="password-input">
+        <input id="password" name="password" type="password" required />
+        <span onclick="togglePassword('password', 'eyeNew')">
+          <i id="eyeNew" class="fa fa-eye"></i>
+        </span>
+      </div>
+
+      <label>Confirm Password</label>
+      <div class="password-input">
+        <input id="confirmPassword" name="confirmPassword" type="password" required />
+        <span onclick="togglePassword('confirmPassword', 'eyeConfirm')">
+          <i id="eyeConfirm" class="fa fa-eye"></i>
+        </span>
+      </div>
+
+      <button type="submit" class="submit-button">Reset Password</button>
+
+      ${success ? `<div class="success-message">${success}</div>` : ''}
+      ${error ? `<div class="error-message">${error}</div>` : ''}
+      <div id="error-message" class="error-message"></div>
+    </form>
+  </body>
+  </html>
+  `;
+}
+
 
 
 
