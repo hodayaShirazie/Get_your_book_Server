@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "user" (
         password TEXT NOT NULL,
         security_question_id INTEGER NOT NULL REFERENCES "security_question"(id),
         security_answer TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL
 );
 
 -- Create Manager table
@@ -125,6 +125,25 @@ CREATE TABLE wish_list (
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (book_id) REFERENCES product(id)
 );
+
+
+
+
+
+
+
+
+
+
+
+---------------
+
+CREATE TABLE password_reset_tokens (
+  token TEXT PRIMARY KEY,
+  username TEXT NOT NULL,
+  expiry BIGINT NOT NULL
+);
+
 
 
 
