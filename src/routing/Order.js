@@ -101,6 +101,18 @@ try {
        WHERE id = $2`,
       [quantity, productId]
     );
+    // Check if product is now in low stock
+    const updatedStockResult = await pool.query(
+      'SELECT stock_quantity, min_stock_threshold FROM product WHERE id = $1',
+      [productId]
+    );
+
+    const { stock_quantity, min_stock_threshold } = updatedStockResult.rows[0];
+
+    if (stock_quantity <= min_stock_threshold) {
+      console.log(`Product ID ${productId} is now in LOW STOCK (${stock_quantity} <= ${min_stock_threshold})`);
+    }
+
 
 
     res.status(201).json({ message: 'Product added to order and stock updated' });
@@ -387,6 +399,22 @@ app.get("/can-cancel-order/:id", async (req, res) => {
     res.status(200).send("Order can be cancelled.");
   } catch (err) {
     res.status(500).send("Error checking order cancellation:", err);
+  }
+});
+
+//get low stock products
+app.get('/low-stock-alerts', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, name, stock_quantity, min_stock_threshold
+      FROM product
+      WHERE stock_quantity <= min_stock_threshold
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching low stock alerts:', error);
+    res.status(500).json({ message: 'Server error while fetching low stock alerts' });
   }
 });
 
