@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const port = 3000;
 // const serverUrl = `http://localhost:${port}`;
-const serverUrl = `https://get-your-book-client.onrender.com/:${port}`;
+const serverUrl = `https://get-your-book-client.onrender.com`;
 
 app.use(express.static('public'));
 
