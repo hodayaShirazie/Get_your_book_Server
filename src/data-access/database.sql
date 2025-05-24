@@ -127,17 +127,7 @@ CREATE TABLE wish_list (
 );
 
 
-
-
-
-
-
-
-
-
-
----------------
-
+--- Create a table to store password reset tokens
 CREATE TABLE password_reset_tokens (
   token TEXT PRIMARY KEY,
   username TEXT NOT NULL,
