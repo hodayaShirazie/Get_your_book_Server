@@ -17,7 +17,8 @@ const ShoppingCart = require('./routing/ShoppingCart');
 const UserProfile = require('./routing/UserProfile');
 const StoreManagement = require('./routing/StoreManagement');
 const WishList = require('./routing/WishList');
-
+const TopBooks = require('./routing/TopBooks');
+app.use(TopBooks);
 app.use(Authentication);
 app.use(Order);
 app.use(Product);
