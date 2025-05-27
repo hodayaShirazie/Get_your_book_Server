@@ -6,6 +6,7 @@ const port = 3000;
 const path = require('path');
 
 
+
 app.use(cors());
 app.use(express.json());
 
@@ -18,6 +19,8 @@ const UserProfile = require('./routing/UserProfile');
 const StoreManagement = require('./routing/StoreManagement');
 const WishList = require('./routing/WishList');
 const TopBooks = require('./routing/TopBooks');
+const productRating = require('./routing/productRating');
+app.use(productRating);
 app.use(TopBooks);
 app.use(Authentication);
 app.use(Order);
