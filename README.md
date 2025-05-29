@@ -9,18 +9,31 @@ This project is the backend for the **Get Your Book** online bookstore platform.
 ├── circleci/
 │   └── config.yml
 ├── node_modules/
+├── public/
 ├── src/
 │   ├── data-access/
-│   │   ├── database.sql
-│   │   └── db.js
-│   ├── index.js
-│   └── init.js
-│   
+│   │   └── database.sql
+│   │   ├── db.js
+│   │   ├── routing/
+│   │   │   └── ProtectedRoutes.jsx
+│   │   │   ├── Authentication.js
+│   │   │   ├── Order.js
+│   │   │   ├── productRating.js
+│   │   │   ├── Products.js
+│   │   │   ├── ShoppingCart.js
+│   │   │   ├── StoreManagement.js
+│   │   │   ├── TopBooks.js
+│   │   │   ├── UserProfile.js
+│   │   │   └── WishList.js
+├── index.js
+├── init-db.js
 ├── tests/
-│   └── demoTest.spec.js
+│   ├── deleteProduct.api.spec.js
+│   └─── login.api.spec.js
 ├── .env
 ├── package.json
 ├── package-lock.json
+├── eslint.config.js
 ├── .gitignore
 └── README.md
 
