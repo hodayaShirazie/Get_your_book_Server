@@ -250,7 +250,7 @@ app.get('/user-orders/:username', async (req, res) => {
     const userId = userResult.rows[0].id;
 
     const ordersResult = await pool.query(`
-      SELECT id, order_date, sum_of_purchase, number_of_products
+      SELECT id, order_date, sum_of_purchase, number_of_products, status
       FROM "orders"
       WHERE user_id = $1
       ORDER BY order_date DESC
