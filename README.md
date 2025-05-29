@@ -59,7 +59,7 @@ To run the backend server on your local machine, follow these steps:
 
 ## Test cases
 
-[View Test cases (PDF)](./docs/Teset_Cases.pdf)
+[View Test cases (PDF)](./docs/Test_Cases.pdf)
 
 
 
