@@ -5,11 +5,8 @@ const app = express();
 const port = 3000;
 const path = require('path');
 
-
-
 app.use(cors());
 app.use(express.json());
-
 
 const Authentication = require('./routing/Authentication');
 const Order = require('./routing/Order');
@@ -29,7 +26,6 @@ app.use(ShoppingCart);
 app.use(UserProfile);
 app.use(StoreManagement);
 app.use(WishList);
-
 
 
 
@@ -56,25 +52,4 @@ app.listen(port, () => {
 }); 
 
 
-
-
-// Export the entire Express app for testing with supertest
 module.exports = app;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

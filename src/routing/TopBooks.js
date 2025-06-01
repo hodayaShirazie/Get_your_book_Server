@@ -1,12 +1,13 @@
 const express = require('express');
-const router = express.Router();
+const app = express.Router();
 const db = require('../data-access/db');
 
 let cachedTopBooks = null;
 let lastCacheTime = null;
 const CACHE_DURATION = 30 * 24 * 60 * 60 * 1000;
 
-router.get('/top-books', async (req, res) => {
+// get top 3 books based on total quantity ordered
+app.get('/top-books', async (req, res) => {
   try {
 
      const now = Date.now();
@@ -47,4 +48,4 @@ router.get('/top-books', async (req, res) => {
 
 
 
-module.exports = router;
+module.exports = app;

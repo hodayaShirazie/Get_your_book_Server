@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../data-access/db'); 
 
-
+// upload product rating]
 router.post('/product-rating', async (req, res) => {
   const { username, bookId, stars } = req.body;
 
@@ -18,7 +18,6 @@ router.post('/product-rating', async (req, res) => {
 
     const userId = userResult.rows[0].id;
 
-    // הכנסת דירוג או עדכון אם כבר קיים
     await pool.query(`
       INSERT INTO book_rating (user_id, book_id, stars)
       VALUES ($1, $2, $3)
@@ -36,7 +35,7 @@ router.post('/product-rating', async (req, res) => {
   }
 });
 
-
+// Fetch average rating for a specific book
 router.get('/product-rating/average/:bookId', async (req, res) => {
   const { bookId } = req.params;
 
@@ -55,7 +54,7 @@ router.get('/product-rating/average/:bookId', async (req, res) => {
   }
 });
 
-
+// Fetch user rating for a specific book
 router.get('/product-rating/user/:bookId/:username', async (req, res) => {
   const { bookId, username } = req.params;
 
@@ -66,7 +65,7 @@ router.get('/product-rating/user/:bookId/:username', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.json({ userRating: 0 }); // לא דירג עדיין
+      return res.json({ userRating: 0 }); 
     }
 
     res.json({ userRating: result.rows[0].stars });

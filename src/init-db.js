@@ -15,15 +15,6 @@ const initDb = async () => {
     `);
 
 
-    // // Insert 3 rows into SecurityQuestion
-    // await pool.query(`
-    //   INSERT INTO "security_question" (question) VALUES
-    //   ('What is your favorite color?'),
-    //   ('What was your first pet''s name?'),
-    //   ('What is the name of your elementary school?');
-    // `);
-
-
     // Create User table
     await pool.query(`
         CREATE TABLE IF NOT EXISTS "user" (
@@ -44,14 +35,6 @@ const initDb = async () => {
       );
     `);
 
-
-    // // Insert default manager
-    // await pool.query(`
-    //     INSERT INTO "manager" (username, password)
-    //     VALUES ('admin', 'admin123')
-    // `);
-
-
         // Create Category table
     await pool.query(`
         CREATE TABLE IF NOT EXISTS "category" (
@@ -59,15 +42,6 @@ const initDb = async () => {
           category TEXT UNIQUE NOT NULL
       );      
     `);
-
-    // // Insert default categories
-    // await pool.query(`
-    // INSERT INTO "category" (category)
-    // VALUES 
-    //     ('Fiction'),
-    //     ('Non-Fiction'),
-    //     ('Children');    
-    // `);
 
 
     // Create product table
